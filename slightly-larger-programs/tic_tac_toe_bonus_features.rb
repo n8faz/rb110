@@ -12,9 +12,11 @@ def prompt(msg)
 end
 
 # rubocop:disable Metrics/AbcSize
-def display_board(brd)
+def display_board(brd, score)
   system 'clear'
   prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
+  prompt "First to win 5 rounds is the winner."
+  print_score(score)
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -80,30 +82,67 @@ def detect_winner(brd)
   nil
 end
 
-loop do
-  board = initialize_board
-
-  display_board(board)
-
-  loop do
-    display_board(board)
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+def keep_score(brd, score)
+  winner = detect_winner(brd)
+  if winner == 'Player'
+    score[:player] += 1
+  elsif winner == 'Computer'
+    score[:computer] += 1
   end
+  score
+end
 
-  display_board(board)
-
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
+def print_score(score)
+  if game_over?(score)
+    prompt "Final Score: "
   else
-    prompt "It's a tie!"
+    prompt "Current Score:"
   end
+  prompt "Player: " + score[:player].to_s
+  prompt "Computer: " + score[:computer].to_s
+end
+
+def game_over?(score)
+  score[:player] == 5 || score[:computer] == 5
+end
+
+def play_round(score)
+  loop do
+    board = initialize_board
+    display_board(board,score)
+
+    loop do
+      display_board(board, score)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
+
+    display_board(board, score)
+    if someone_won?(board)
+      prompt "#{detect_winner(board)} won!"
+      score = keep_score(board, score)
+    else
+      prompt "It's a tie!"
+    end
+
+    print_score(score)
+    break if game_over?(score)
+    prompt "Continue to next round?"
+    answer = gets.chomp
+    break unless answer.downcase.start_with?('y')
+  end
+end
+
+score = { player: 0, computer: 0 }
+loop do
+  play_round(score)
 
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
+
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye!"
