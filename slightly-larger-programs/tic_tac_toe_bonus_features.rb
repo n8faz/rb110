@@ -106,6 +106,15 @@ def game_over?(score)
   score[:player] == 5 || score[:computer] == 5
 end
 
+def print_winner(score)
+  if score[:player] == 5
+    prompt "Player is the winner!"
+  elsif score[:computer] == 5
+    prompt "Computer is the winner!"
+  end
+end
+
+
 def play_round(score)
   loop do
     board = initialize_board
@@ -121,7 +130,7 @@ def play_round(score)
 
     display_board(board, score)
     if someone_won?(board)
-      prompt "#{detect_winner(board)} won!"
+      prompt "#{detect_winner(board)} won this round!"
       score = keep_score(board, score)
     else
       prompt "It's a tie!"
@@ -138,6 +147,8 @@ end
 score = { player: 0, computer: 0 }
 loop do
   play_round(score)
+
+  print_winner(score)
 
   prompt "Play again? (y or n)"
   answer = gets.chomp
