@@ -44,7 +44,11 @@ def empty_squares(brd)
 end
 
 def joinor(squares, punctuation = ", ", conjunction = "or")
-  squares.join(punctuation).insert(-2, conjunction + " ")
+  if squares.length == 1
+    "#{squares[0]} is the only open square"
+  else
+    squares.join(punctuation).insert(-2, conjunction + " ")
+  end
 end
 
 def player_places_piece!(brd)
