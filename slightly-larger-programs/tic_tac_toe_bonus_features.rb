@@ -62,21 +62,32 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_immediate_threat(line, board, marker)
+  if board.values_at(*line).count(marker) == 2
+    square = board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
+  else
+    nil
+  end
+end
 
 def computer_places_piece!(brd)
   square = nil
+
   WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(COMPUTER_MARKER) == 2
-      square = brd.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.sample
-    elsif brd.values_at(*line).count(PLAYER_MARKER) == 2
-      square = brd.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.sample
-    else
-      nil
+    square = find_immediate_threat(line, brd, COMPUTER_MARKER)
+    break if square
+  end
+
+  if !square
+    WINNING_LINES.each do |line|
+      square = find_immediate_threat(line, brd, PLAYER_MARKER)
+      break if square
     end
   end
-  if square == nil
-    square = empty_squares(brd).sample
-  end
+
+  square = 5 if brd[5] == INITIAL_MARKER && !square
+  square = empty_squares(brd).sample if !square
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -164,7 +175,6 @@ end
 score = { player: 0, computer: 0 }
 loop do
   play_round(score)
-
   print_winner(score)
 
   prompt "Play again? (y or n)"
