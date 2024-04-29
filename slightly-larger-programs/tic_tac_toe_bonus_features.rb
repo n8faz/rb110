@@ -66,9 +66,9 @@ end
 def computer_places_piece!(brd)
   square = nil
   WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(PLAYER_MARKER) == 2
+    if brd.values_at(*line).count(COMPUTER_MARKER) == 2
       square = brd.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.sample
-    elsif brd.values_at(*line).count(COMPUTER_MARKER) == 2
+    elsif brd.values_at(*line).count(PLAYER_MARKER) == 2
       square = brd.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.sample
     else
       nil
