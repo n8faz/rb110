@@ -11,16 +11,23 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-def print_intro(score)
+def print_intro
+  system 'clear'
+  prompt "Welcome to Tic-Tac-Toe!"
   prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
   prompt "First to win 5 rounds is the winner."
-  print_score(score)
+end
+
+def ready?
+  prompt "Are you ready to begin?"
+  answer = gets.chomp
+  true if answer.downcase.start_with?('y')
 end
 
 # rubocop:disable Metrics/AbcSize
 def display_board(brd, score)
   system 'clear'
-  print_intro(score)
+  print_score(score)
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -89,7 +96,6 @@ def computer_places_piece!(brd)
 
   square = 5 if brd[5] == INITIAL_MARKER && !square
   square = empty_squares(brd).sample if !square
-
   brd[square] = COMPUTER_MARKER
 end
 
@@ -144,21 +150,50 @@ def print_winner(score)
   end
 end
 
-def who_goes_first?(players)
-  prompt "Do you care who goes first?"
-  answer = gets.chomp
-  if answer.downcase.start_with?('n')
-    prompt "Computer will choose who goes first"
-    players.sample
-  elsif answer.downcase.start_with?('y')
-    prompt "Who should go first? (1 for you, 2 for Computer)"
+def yes_or_no?(answer)
+  if answer.downcase.start_with?('y')
+    'yes'
+  elsif answer.downcase.start_with?('n')
+    'no'
+  end
+end
+
+def player_choice(initial_player)
+  loop do
+    prompt "Who should go first? (1 for Player, 2 for Computer)"
     first_player = gets.chomp
     if first_player == '1'
-      "Player"
+      initial_player = "Player"
+      break
     elsif first_player == '2'
-      "Computer"
+      initial_player = "Computer"
+      break
+    else
+      prompt "Invalid Choice. Please enter 1 or 2"
     end
   end
+  initial_player
+end
+
+def who_goes_first?(players)
+  initial_player = nil
+  loop do
+    prompt "Do you care who goes first?"
+    answer = gets.chomp
+    answer = yes_or_no?(answer)
+    if answer == 'no'
+      prompt "Computer will choose who goes first"
+      initial_player = players.sample
+      break
+    elsif answer == 'yes'
+      initial_player = player_choice(initial_player)
+      break
+    else
+      prompt "Invalid Choice. Please specify Yes or No"
+    end
+    break if initial_player
+  end
+  initial_player
 end
 
 def place_piece!(board, current_player)
@@ -182,7 +217,8 @@ def play_round(score, players)
     board = initialize_board
     current_player = who_goes_first?(players)
     prompt "#{current_player} will make the first move"
-    sleep 2
+    prompt "Let's begin! Loading the board..."
+    sleep 3
     display_board(board, score)
 
     loop do
@@ -208,15 +244,23 @@ def play_round(score, players)
   end
 end
 
+def play_again?
+  prompt "Play again? (y or n)"
+  answer = gets.chomp
+  true if answer.downcase.start_with?('y')
+end
+
+# Program start
+
 players = ["Player", "Computer"]
 score = { player: 0, computer: 0 }
 loop do
-  play_round(score, players)
+  print_intro
+  play_round(score, players) if ready?
   print_winner(score)
 
-  prompt "Play again? (y or n)"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  # play again? unless !ready?
+  break unless play_again?
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye!"
