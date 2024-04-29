@@ -26,7 +26,7 @@ end
 
 # rubocop:disable Metrics/AbcSize
 def display_board(brd, score)
-  system 'clear'
+  print_intro
   print_score(score)
   puts ""
   puts "     |     |"
