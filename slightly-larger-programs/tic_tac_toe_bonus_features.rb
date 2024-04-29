@@ -11,12 +11,16 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-# rubocop:disable Metrics/AbcSize
-def display_board(brd, score)
-  system 'clear'
+def print_intro(score)
   prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
   prompt "First to win 5 rounds is the winner."
   print_score(score)
+end
+
+# rubocop:disable Metrics/AbcSize
+def display_board(brd, score)
+  system 'clear'
+  print_intro(score)
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -47,7 +51,7 @@ def joinor(squares, punctuation = ", ", conjunction = "or")
   if squares.length == 1
     "#{squares[0]} is the only open square"
   else
-    squares.join(punctuation).insert(-2, conjunction + " ")
+    squares.join(punctuation).insert(-2, "#{conjunction} ")
   end
 end
 
@@ -64,9 +68,7 @@ end
 
 def find_immediate_threat(line, board, marker)
   if board.values_at(*line).count(marker) == 2
-    square = board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
-  else
-    nil
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   end
 end
 
@@ -126,8 +128,8 @@ def print_score(score)
   else
     prompt "Current Score:"
   end
-  prompt "Player: " + score[:player].to_s
-  prompt "Computer: " + score[:computer].to_s
+  prompt "Player: #{score[:player]} "
+  prompt "Computer: #{score[:computer]} "
 end
 
 def game_over?(score)
@@ -142,11 +144,10 @@ def print_winner(score)
   end
 end
 
-
 def play_round(score)
   loop do
     board = initialize_board
-    display_board(board,score)
+    display_board(board, score)
 
     loop do
       display_board(board, score)
@@ -180,7 +181,6 @@ loop do
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
-
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye!"
