@@ -144,16 +144,51 @@ def print_winner(score)
   end
 end
 
-def play_round(score)
+def who_goes_first?(players)
+  prompt "Do you care who goes first?"
+  answer = gets.chomp
+  if answer.downcase.start_with?('n')
+    prompt "Computer will choose who goes first"
+    players.sample
+  elsif answer.downcase.start_with?('y')
+    prompt "Who should go first? (1 for you, 2 for Computer)"
+    first_player = gets.chomp
+    if first_player == '1'
+      "Player"
+    elsif first_player == '2'
+      "Computer"
+    end
+  end
+end
+
+def place_piece!(board, current_player)
+  if current_player == "Player"
+    player_places_piece!(board)
+  elsif current_player == "Computer"
+    computer_places_piece!(board)
+  end
+end
+
+def alternate_player(current_player)
+  if current_player == "Player"
+    "Computer"
+  elsif current_player == "Computer"
+    "Player"
+  end
+end
+
+def play_round(score, players)
   loop do
     board = initialize_board
+    current_player = who_goes_first?(players)
+    prompt "#{current_player} will make the first move"
+    sleep 2
     display_board(board, score)
 
     loop do
       display_board(board, score)
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-      computer_places_piece!(board)
+      place_piece!(board, current_player)
+      current_player = alternate_player(current_player)
       break if someone_won?(board) || board_full?(board)
     end
 
@@ -173,9 +208,10 @@ def play_round(score)
   end
 end
 
+players = ["Player", "Computer"]
 score = { player: 0, computer: 0 }
 loop do
-  play_round(score)
+  play_round(score, players)
   print_winner(score)
 
   prompt "Play again? (y or n)"
