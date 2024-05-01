@@ -49,18 +49,17 @@ def yes_or_no?(answer)
   end
 end
 
-def who_goes_first?(players)
+def who_goes_first?(name)
   initial_player = nil
   loop do
-    prompt "Do you care who goes first?"
     answer = gets.chomp
     answer = yes_or_no?(answer)
     if answer == 'no'
       prompt "Computer will choose who goes first"
-      initial_player = players.sample
+      initial_player = [name, 'Computer'].sample
       break
     elsif answer == 'yes'
-      initial_player = get_player_choice(initial_player)
+      initial_player = get_player_choice(initial_player, name)
       break
     else
       prompt "Invalid Choice. Please specify Yes or No"
@@ -147,12 +146,12 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def get_player_choice(initial_player)
+def get_player_choice(initial_player, name)
   loop do
-    prompt "Who should go first? (1 for Player, 2 for Computer)"
+    prompt "Who should go first? (1 for #{name}, 2 for Computer)"
     first_player = gets.chomp
     if first_player == '1'
-      initial_player = "Player"
+      initial_player = name
       break
     elsif first_player == '2'
       initial_player = "Computer"
@@ -168,8 +167,9 @@ def get_answer
   loop do
     answer = gets.chomp
     answer = yes_or_no?(answer)
-    break if answer == 'no' || 'yes'
+    break if answer == 'no' || answer == 'yes'
     prompt "Invalid Choice. Please specify Yes or No"
+  end
 end
 
 def get_name
@@ -190,10 +190,9 @@ def get_rounds_to_win
   loop do
     rounds_to_win = gets.chomp
     break if valid_number?(rounds_to_win)
-      prompt "That isn't a valid number. Please enter the number of rounds to win. (Example: 3 or 5)"
-    end
+    prompt "That isn't a valid number. Please enter the number of rounds to win. (Example: 3 or 5)"
   end
-  rounds_to_win
+  rounds_to_win.to_i
 end
 
 def detect_winner(brd)
@@ -217,35 +216,35 @@ def keep_score(brd, score)
   score
 end
 
-def print_intro
+def print_info(rounds_to_win)
   system 'clear'
-  prompt "Welcome to Tic-Tac-Toe!"
+  prompt "Let's play Tic-Tac-Toe!"
   prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
-  prompt "First to win 5 rounds is the winner."
+  prompt "First to win #{rounds_to_win} rounds is the winner."
 end
 
-def print_winner(score, rounds_to_win)
+def print_winner(score, rounds_to_win, name)
   if score[:player] == rounds_to_win
-    prompt "Player is the winner!"
+    prompt "#{name} is the winner!"
   elsif score[:computer] == rounds_to_win
     prompt "Computer is the winner!"
   end
 end
 
-def print_score(score, rounds_to_win)
+def print_score(score, rounds_to_win, name)
   if game_over?(score, rounds_to_win)
     prompt "Final Score: "
   else
     prompt "Current Score:"
   end
-  prompt "Player: #{score[:player]} "
+  prompt "#{name}: #{score[:player]} "
   prompt "Computer: #{score[:computer]} "
 end
 
 # rubocop:disable Metrics/AbcSize
-def display_board(brd, score)
-  print_intro
-  print_score(score)
+def display_board(brd, score, rounds_to_win, name)
+  print_info(rounds_to_win)
+  print_score(score, rounds_to_win, name)
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -262,47 +261,40 @@ def display_board(brd, score)
 end
 # rubocop:enable Metrics/AbcSize
 
-def setup_game()
+def setup_game(name, rounds_to_win, initial_player)
+  system 'clear'
   prompt "Welcome to Tic-Tac-Toe! Let's start by getting your name"
   name = get_name
   prompt "Hello, #{name}! I have a few questions to ask before we start"
   prompt "How many rounds must be won for a winner to be declared?"
   rounds_to_win = get_rounds_to_win
   prompt "Great, first to win #{rounds_to_win} rounds is the winner."
-  prompt "Last Question. Do you care who goes first?"
-  answer = get_answer
-  if answer == 'no'
-    prompt "Computer will choose who goes first"
-    initial_player = players.sample
-  elsif answer == 'yes'
-    initial_player = get_player_choice
-  end
+  prompt "Do you care who goes first?"
+  initial_player = who_goes_first?(name)
   prompt "#{initial_player} will make the first move"
   prompt "Let's begin! Loading the board..."
   sleep 3
+  return name, rounds_to_win, initial_player
 end
 
-def play_turn(score, players, board, current_player)
+def play_turn(score, board, current_player, rounds_to_win, name)
   loop do
-    display_board(board, score)
+    display_board(board, score, rounds_to_win, name)
     place_piece!(board, current_player)
     current_player = alternate_player(current_player)
     break if someone_won?(board) || board_full?(board)
   end
 end
 
-def play_round(score, players)
+def play_round(score, players, initial_player, rounds_to_win, name)
   loop do
     board = initialize_board
     current_player = initial_player
-    prompt "#{current_player} will make the first move"
-    prompt "Let's begin! Loading the board..."
-    sleep 3
-    display_board(board, score)
+    display_board(board, score, rounds_to_win, name)
 
-    play_turn(score, board, current_player)
+    play_turn(score, board, current_player, rounds_to_win, name)
 
-    display_board(board, score)
+    display_board(board, score, rounds_to_win, name)
     if someone_won?(board)
       prompt "#{detect_winner(board)} won this round!"
       score = keep_score(board, score)
@@ -310,8 +302,8 @@ def play_round(score, players)
       prompt "It's a tie!"
     end
 
-    print_score(score)
-    break if game_over?(score)
+    print_score(score, rounds_to_win, name)
+    break if game_over?(score, rounds_to_win)
     prompt "Continue to next round?"
     answer = gets.chomp
     break unless answer.downcase.start_with?('y')
@@ -320,15 +312,14 @@ end
 
 
 # Program start
-name = ''
-rounds_to_win = 0
-current_player = nil
-players = ["#{name}", "Computer"]
+
+name, rounds_to_win, initial_player = setup_game(name, rounds_to_win, initial_player)
+players = [name, 'Computer']
 score = { player: 0, computer: 0 }
+
 loop do
-  print_intro
-  play_round(score, players) if ready?
-  print_winner(score)
+  play_round(score, players, initial_player, rounds_to_win, name)
+  print_winner(score, rounds_to_win, name)
 
   break unless play_again?
 end
