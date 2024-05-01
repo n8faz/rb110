@@ -52,17 +52,13 @@ end
 def who_goes_first?(name)
   initial_player = nil
   loop do
-    answer = gets.chomp
-    answer = yes_or_no?(answer)
+    answer = answer()
     if answer == 'no'
-      prompt "Computer will choose who goes first"
-      initial_player = [name, 'Computer'].sample
+      initial_player = computer_chooses(name)
       break
     elsif answer == 'yes'
-      initial_player = get_player_choice(initial_player, name)
+      initial_player = player_chooses(initial_player, name)
       break
-    else
-      prompt "Invalid Choice. Please specify Yes or No"
     end
     break if initial_player
   end
@@ -70,7 +66,7 @@ def who_goes_first?(name)
 end
 
 def play_again?
-  prompt "Play again? (y or n)"
+  prompt "Play again?"
   answer = gets.chomp
   true if answer.downcase.start_with?('y')
 end
@@ -99,20 +95,25 @@ def find_immediate_threat(line, board, marker)
   end
 end
 
-def alternate_player(current_player)
-  if current_player == "Player"
+def alternate_player(current_player, name)
+  if current_player == name
     "Computer"
   elsif current_player == "Computer"
-    "Player"
+    name
   end
 end
 
-def place_piece!(board, current_player)
-  if current_player == "Player"
+def place_piece!(board, current_player, name)
+  if current_player == name
     player_places_piece!(board)
   elsif current_player == "Computer"
     computer_places_piece!(board)
   end
+end
+
+def computer_chooses(name)
+  prompt "Computer will choose who goes first"
+  [name, 'Computer'].sample
 end
 
 def computer_places_piece!(brd)
@@ -146,7 +147,7 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def get_player_choice(initial_player, name)
+def player_chooses(initial_player, name)
   loop do
     prompt "Who should go first? (1 for #{name}, 2 for Computer)"
     first_player = gets.chomp
@@ -163,16 +164,18 @@ def get_player_choice(initial_player, name)
   initial_player
 end
 
-def get_answer
+def answer
+  answer = nil
   loop do
     answer = gets.chomp
     answer = yes_or_no?(answer)
     break if answer == 'no' || answer == 'yes'
     prompt "Invalid Choice. Please specify Yes or No"
   end
+  answer
 end
 
-def get_name
+def name
   name = nil
   loop do
     name = gets.chomp
@@ -185,12 +188,12 @@ def get_name
   name
 end
 
-def get_rounds_to_win
+def rounds_to_win
   rounds_to_win = 0
   loop do
     rounds_to_win = gets.chomp
     break if valid_number?(rounds_to_win)
-    prompt "That isn't a valid number. Please enter the number of rounds to win. (Example: 3 or 5)"
+    prompt "Please enter the number of rounds to win. (Example: 3 or 5)"
   end
   rounds_to_win.to_i
 end
@@ -214,6 +217,17 @@ def keep_score(brd, score)
     score[:computer] += 1
   end
   score
+end
+
+def end_of_round(board, score, rounds_to_win, name)
+  display_board(board, score, rounds_to_win, name)
+  if someone_won?(board)
+    prompt "#{detect_winner(board)} won this round!"
+    score = keep_score(board, score)
+  else
+    prompt "It's a tie!"
+  end
+  print_score(score, rounds_to_win, name)
 end
 
 def print_info(rounds_to_win)
@@ -264,10 +278,10 @@ end
 def setup_game
   system 'clear'
   prompt "Welcome to Tic-Tac-Toe! Let's start by getting your name"
-  name = get_name
+  name = name()
   prompt "Hello, #{name}! I have a few questions to ask before we start"
   prompt "How many rounds must be won for a winner to be declared?"
-  rounds_to_win = get_rounds_to_win
+  rounds_to_win = rounds_to_win()
   prompt "Great, first to win #{rounds_to_win} rounds is the winner."
   prompt "Do you care who goes first?"
   initial_player = who_goes_first?(name)
@@ -280,8 +294,8 @@ end
 def play_turn(score, board, current_player, rounds_to_win, name)
   loop do
     display_board(board, score, rounds_to_win, name)
-    place_piece!(board, current_player)
-    current_player = alternate_player(current_player)
+    place_piece!(board, current_player, name)
+    current_player = alternate_player(current_player, name)
     break if someone_won?(board) || board_full?(board)
   end
 end
@@ -290,23 +304,14 @@ def play_round(score, initial_player, rounds_to_win, name)
   loop do
     board = initialize_board
     current_player = initial_player
-    display_board(board, score, rounds_to_win, name)
 
     play_turn(score, board, current_player, rounds_to_win, name)
-
-    display_board(board, score, rounds_to_win, name)
-    if someone_won?(board)
-      prompt "#{detect_winner(board)} won this round!"
-      score = keep_score(board, score)
-    else
-      prompt "It's a tie!"
-    end
-
-    print_score(score, rounds_to_win, name)
+    end_of_round(board, score, rounds_to_win, name)
     break if game_over?(score, rounds_to_win)
+
     prompt "Continue to next round?"
-    answer = gets.chomp
-    break unless answer.downcase.start_with?('y')
+    answer = answer()
+    break unless answer == 'yes'
   end
 end
 
@@ -318,7 +323,6 @@ score = { player: 0, computer: 0 }
 loop do
   play_round(score, initial_player, rounds_to_win, name)
   print_winner(score, rounds_to_win, name)
-
   break unless play_again?
 end
 
