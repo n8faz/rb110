@@ -261,7 +261,7 @@ def display_board(brd, score, rounds_to_win, name)
 end
 # rubocop:enable Metrics/AbcSize
 
-def setup_game(name, rounds_to_win, initial_player)
+def setup_game
   system 'clear'
   prompt "Welcome to Tic-Tac-Toe! Let's start by getting your name"
   name = get_name
@@ -286,7 +286,7 @@ def play_turn(score, board, current_player, rounds_to_win, name)
   end
 end
 
-def play_round(score, players, initial_player, rounds_to_win, name)
+def play_round(score, initial_player, rounds_to_win, name)
   loop do
     board = initialize_board
     current_player = initial_player
@@ -310,15 +310,13 @@ def play_round(score, players, initial_player, rounds_to_win, name)
   end
 end
 
-
 # Program start
 
-name, rounds_to_win, initial_player = setup_game(name, rounds_to_win, initial_player)
-players = [name, 'Computer']
+name, rounds_to_win, initial_player = setup_game
 score = { player: 0, computer: 0 }
 
 loop do
-  play_round(score, players, initial_player, rounds_to_win, name)
+  play_round(score, initial_player, rounds_to_win, name)
   print_winner(score, rounds_to_win, name)
 
   break unless play_again?
