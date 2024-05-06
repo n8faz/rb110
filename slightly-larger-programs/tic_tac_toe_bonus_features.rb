@@ -11,6 +11,40 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+def answer
+  answer = nil
+  loop do
+    answer = gets.chomp
+    answer = yes_or_no?(answer)
+    break if answer == 'no' || answer == 'yes'
+    prompt "Invalid Choice. Please specify Yes or No"
+  end
+  answer
+end
+
+def name
+  name = nil
+  loop do
+    name = gets.chomp
+    if name.empty? || name.start_with?(' ')
+      prompt "Sorry, I didn't get that. What is your name?"
+    else
+      break
+    end
+  end
+  name
+end
+
+def rounds_to_win
+  rounds_to_win = 0
+  loop do
+    rounds_to_win = gets.chomp
+    break if valid_number?(rounds_to_win)
+    prompt "Please enter the number of rounds to win. (Example: 3 or 5)"
+  end
+  rounds_to_win.to_i
+end
+
 def integer?(num)
   num.to_i.to_s == num
 end
@@ -25,8 +59,8 @@ end
 
 def ready?
   prompt "Are you ready to begin?"
-  answer = gets.chomp
-  true if answer.downcase.start_with?('y')
+  answer = answer()
+  true if answer == 'yes'
 end
 
 def board_full?(brd)
@@ -167,40 +201,6 @@ def player_chooses(initial_player, name)
     end
   end
   initial_player
-end
-
-def answer
-  answer = nil
-  loop do
-    answer = gets.chomp
-    answer = yes_or_no?(answer)
-    break if answer == 'no' || answer == 'yes'
-    prompt "Invalid Choice. Please specify Yes or No"
-  end
-  answer
-end
-
-def name
-  name = nil
-  loop do
-    name = gets.chomp
-    if name.empty? || name.start_with?(' ')
-      prompt "Sorry, I didn't get that. What is your name?"
-    else
-      break
-    end
-  end
-  name
-end
-
-def rounds_to_win
-  rounds_to_win = 0
-  loop do
-    rounds_to_win = gets.chomp
-    break if valid_number?(rounds_to_win)
-    prompt "Please enter the number of rounds to win. (Example: 3 or 5)"
-  end
-  rounds_to_win.to_i
 end
 
 def detect_winner(brd)
