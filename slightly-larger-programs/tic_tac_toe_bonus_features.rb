@@ -67,8 +67,8 @@ end
 
 def play_again?
   prompt "Play again?"
-  answer = gets.chomp
-  true if answer.downcase.start_with?('y')
+  answer = answer()
+  true if answer == 'yes'
 end
 
 def initialize_board
@@ -116,21 +116,26 @@ def computer_chooses(name)
   [name, 'Computer'].sample
 end
 
-def computer_places_piece!(brd)
-  square = nil
-
+def computer_plays_offense(brd, square)
   WINNING_LINES.each do |line|
     square = find_immediate_threat(line, brd, COMPUTER_MARKER)
     break if square
   end
+  square
+end
 
-  if !square
-    WINNING_LINES.each do |line|
-      square = find_immediate_threat(line, brd, PLAYER_MARKER)
-      break if square
-    end
+def computer_plays_defense(brd, square)
+  WINNING_LINES.each do |line|
+    square = find_immediate_threat(line, brd, PLAYER_MARKER)
+    break if square
   end
+  square
+end
 
+def computer_places_piece!(brd)
+  square = nil
+  square = computer_plays_offense(brd, square)
+  square = computer_plays_defense(brd, square) if !square
   square = 5 if brd[5] == INITIAL_MARKER && !square
   square = empty_squares(brd).sample if !square
   brd[square] = COMPUTER_MARKER
@@ -323,7 +328,11 @@ score = { player: 0, computer: 0 }
 loop do
   play_round(score, initial_player, rounds_to_win, name)
   print_winner(score, rounds_to_win, name)
-  break unless play_again?
+  if play_again?
+    score = { player: 0, computer: 0 }
+  else
+    break
+  end
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye!"
