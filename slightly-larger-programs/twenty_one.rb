@@ -122,7 +122,6 @@ def dealer_turn(deck, dealer_cards, dealer_value)
       break
     else
       prompt "The dealer has to take a card..."
-      sleep 3
       dealer_cards << deal_card(deck)
     end
   end
@@ -173,10 +172,11 @@ loop do
     prompt "Your value is: #{player_value}"
     prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     prompt "Dealer's value is: #{dealer_value}"
+    puts
   end
 
   print_result(player_value, dealer_value)
-
+  puts
   break unless play_again?
 end
 
