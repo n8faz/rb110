@@ -60,6 +60,27 @@ def dealer_stay?(total)
   total >= 17
 end
 
+def hit_or_stay?
+  answer = nil
+  loop do
+    puts "hit or stay?"
+    answer = gets.chomp
+    break if answer == "stay" || answer == "hit"
+    puts "Invalid answer. Please enter 'hit' or 'stay'"
+  end
+  answer
+end
+
+def player_turn(deck, player_cards, player_value)
+  loop do
+    player_move = hit_or_stay?
+    player_cards << deal_card(deck) if player_move == "hit"
+    player_value = calculate_value(player_cards)
+    puts "You now have " + + player_cards.map { |card| card[1]}.join(', ')
+    break if busted?(player_value) || player_move == "stay"
+  end
+end
+
 system 'clear'
 
 deck = {
@@ -81,17 +102,20 @@ puts "Dealer's upcard is: #{dealer_cards[0][1]}"
 puts "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
 puts "Your value is: #{player_value}"
 
-answer = nil
-loop do
-  puts "hit or stay?"
-  answer = gets.chomp
-  break if answer == "stay" || busted?(player_value)
-  player_cards << deal_card(deck) if answer == "hit"
-  player_value = calculate_value(player_cards)
-  puts "You now have " + player_cards.map { |card| card[1]}.join(', ')
-  puts "Your value is: #{player_value}"
-  break if busted?(player_value)
-end
+# answer = nil
+# loop do
+#   puts "hit or stay?"
+#   answer = gets.chomp
+#   break if answer == "stay" || busted?(player_value)
+#   player_cards << deal_card(deck) if answer == "hit"
+#   player_value = calculate_value(player_cards)
+#   puts "You now have " + player_cards.map { |card| card[1]}.join(', ')
+#   puts "Your value is: #{player_value}"
+#   break if busted?(player_value)
+# end
+#
+
+player_turn(deck, player_cards, player_value)
 
 unless busted?(player_value)
   puts
