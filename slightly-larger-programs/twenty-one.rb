@@ -74,56 +74,21 @@ end
 def player_turn(deck, player_cards, player_value)
   loop do
     player_move = hit_or_stay?
+    break if player_move == "stay"
     player_cards << deal_card(deck) if player_move == "hit"
     player_value = calculate_value(player_cards)
     puts "You now have " + + player_cards.map { |card| card[1]}.join(', ')
-    break if busted?(player_value) || player_move == "stay"
+    puts "Your value is: #{player_value}"
+    break if busted?(player_value)
   end
 end
 
-system 'clear'
-
-deck = {
-        H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
-        }
-
-
-
-dealer_cards = [deal_card(deck), deal_card(deck)]
-player_cards = [deal_card(deck), deal_card(deck)]
-
-dealer_value = calculate_value(dealer_cards)
-player_value = calculate_value(player_cards)
-
-puts "Dealer's upcard is: #{dealer_cards[0][1]}"
-puts "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
-puts "Your value is: #{player_value}"
-
-# answer = nil
-# loop do
-#   puts "hit or stay?"
-#   answer = gets.chomp
-#   break if answer == "stay" || busted?(player_value)
-#   player_cards << deal_card(deck) if answer == "hit"
-#   player_value = calculate_value(player_cards)
-#   puts "You now have " + player_cards.map { |card| card[1]}.join(', ')
-#   puts "Your value is: #{player_value}"
-#   break if busted?(player_value)
-# end
-#
-
-player_turn(deck, player_cards, player_value)
-
-unless busted?(player_value)
+def dealer_turn(deck, dealer_cards, dealer_value)
   puts
   puts "The dealer's facedown card was #{dealer_cards[1][1]}"
   puts "The dealer has: #{dealer_cards[0][1]} and #{dealer_cards[1][1]}"
   loop do
     dealer_value = calculate_value(dealer_cards)
-
     puts "The dealer's value is #{calculate_value(dealer_cards)}"
     if busted?(dealer_value)
       break
@@ -138,11 +103,37 @@ unless busted?(player_value)
     end
   end
 end
+
+# Program Start
+
+system 'clear'
+
+deck = {
+        H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+        D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+        C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+        S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+        }
+
+
+dealer_cards = [deal_card(deck), deal_card(deck)]
+player_cards = [deal_card(deck), deal_card(deck)]
+
+dealer_value = calculate_value(dealer_cards)
+player_value = calculate_value(player_cards)
+
+puts "Dealer's upcard is: #{dealer_cards[0][1]}"
+puts "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
+puts "Your value is: #{player_value}"
+
+player_turn(deck, player_cards, player_value)
+
+dealer_turn(deck, dealer_cards, dealer_value) unless busted?(calculate_value(player_cards))
+
 dealer_value = calculate_value(dealer_cards)
 player_value = calculate_value(player_cards)
 
 puts
-puts "You have: #{player_value} Dealer has: #{dealer_value}"
 print_result(player_value, dealer_value)
 
 #binding.pry
