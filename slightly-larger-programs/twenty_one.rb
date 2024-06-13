@@ -163,16 +163,18 @@ loop do
   prompt "Your value is: #{player_value}"
 
   player_turn(deck, player_cards, player_value)
-
-  dealer_turn(deck, dealer_cards, dealer_value) unless busted?(calculate_value(player_cards))
+  player_value = calculate_value(player_cards)
+  dealer_turn(deck, dealer_cards, dealer_value) unless busted?(player_value)
 
   dealer_value = calculate_value(dealer_cards)
   player_value = calculate_value(player_cards)
 
   unless busted?(player_value) || busted?(dealer_value)
     puts
-    prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}. Your value is: #{player_value}"
-    prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}. Dealer's value is: #{dealer_value}"
+    prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}."
+    prompt "Your value is: #{player_value}"
+    prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}."
+    prompt "Dealer's value is: #{dealer_value}"
   end
 
   print_result(player_value, dealer_value)
