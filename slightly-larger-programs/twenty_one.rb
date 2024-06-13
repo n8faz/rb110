@@ -113,8 +113,8 @@ end
 def dealer_turn(deck, dealer_cards, dealer_value)
   puts
   prompt "The dealer's facedown card was #{dealer_cards[1][1]}"
-  prompt "The dealer has: #{dealer_cards[0][1]} and #{dealer_cards[1][1]}"
   loop do
+    prompt "The dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     dealer_value = calculate_value(dealer_cards)
     prompt "The dealer's value is #{calculate_value(dealer_cards)}"
     if busted?(dealer_value)
@@ -123,10 +123,9 @@ def dealer_turn(deck, dealer_cards, dealer_value)
       prompt "Dealer stays. Their value is #{calculate_value(dealer_cards)}"
       break
     else
-      prompt "The dealer has to take a card"
+      prompt "The dealer has to take a card..."
       sleep 3
       dealer_cards << deal_card(deck)
-      prompt "The dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     end
   end
 end
@@ -171,9 +170,9 @@ loop do
 
   unless busted?(player_value) || busted?(dealer_value)
     puts
-    prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}."
+    prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}"
     prompt "Your value is: #{player_value}"
-    prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}."
+    prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     prompt "Dealer's value is: #{dealer_value}"
   end
 
