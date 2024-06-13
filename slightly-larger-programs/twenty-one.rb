@@ -8,6 +8,25 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+def answer
+  answer = nil
+  loop do
+    answer = gets.chomp
+    answer = yes_or_no?(answer)
+    break if answer == 'no' || answer == 'yes'
+    prompt "Invalid Choice. Please specify Yes or No"
+  end
+  answer
+end
+
+def yes_or_no?(answer)
+  if answer.downcase.start_with?('y')
+    'yes'
+  elsif answer.downcase.start_with?('n')
+    'no'
+  end
+end
+
 def deal_card(deck)
   suit = deck.keys.sample
   value = deck[suit].sample
@@ -112,39 +131,52 @@ def dealer_turn(deck, dealer_cards, dealer_value)
   end
 end
 
+def play_again?
+  prompt "Play again?"
+  answer = answer()
+  true if answer == 'yes'
+end
+
 # Program Start
 
-clear_screen
+loop do
+  clear_screen
 
-deck = {
-        H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
-        }
+  prompt "Let's play 21!"
+  puts
+
+  deck = {
+          H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+          D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+          C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+          S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+          }
 
 
-dealer_cards = [deal_card(deck), deal_card(deck)]
-player_cards = [deal_card(deck), deal_card(deck)]
+  dealer_cards = [deal_card(deck), deal_card(deck)]
+  player_cards = [deal_card(deck), deal_card(deck)]
 
-dealer_value = calculate_value(dealer_cards)
-player_value = calculate_value(player_cards)
+  dealer_value = calculate_value(dealer_cards)
+  player_value = calculate_value(player_cards)
 
-prompt "Dealer's upcard is: #{dealer_cards[0][1]}"
-prompt "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
-prompt "Your value is: #{player_value}"
+  prompt "Dealer's upcard is: #{dealer_cards[0][1]}"
+  prompt "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
+  prompt "Your value is: #{player_value}"
 
-player_turn(deck, player_cards, player_value)
+  player_turn(deck, player_cards, player_value)
 
-dealer_turn(deck, dealer_cards, dealer_value) unless busted?(calculate_value(player_cards))
+  dealer_turn(deck, dealer_cards, dealer_value) unless busted?(calculate_value(player_cards))
 
-dealer_value = calculate_value(dealer_cards)
-player_value = calculate_value(player_cards)
+  dealer_value = calculate_value(dealer_cards)
+  player_value = calculate_value(player_cards)
 
-puts
-prompt "You have #{player_cards.map { |card| card[1]}.join(', ')}, Your value is: #{player_value}"
-prompt "Dealer has #{dealer_cards.map { |card| card[1]}.join(', ')}. Dealer's value is: #{dealer_value}"
+  puts
+  prompt "You have #{player_cards.map { |card| card[1]}.join(', ')}. Your value is: #{player_value}"
+  prompt "Dealer has #{dealer_cards.map { |card| card[1]}.join(', ')}. Dealer's value is: #{dealer_value}"
 
-print_result(player_value, dealer_value)
+  print_result(player_value, dealer_value)
+  break unless play_again?
+end
 
+prompt "Thanks for playing! Goodbye!"
 #binding.pry
