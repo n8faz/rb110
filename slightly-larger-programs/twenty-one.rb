@@ -85,7 +85,7 @@ def player_turn(deck, player_cards, player_value)
     break if player_move == "stay"
     player_cards << deal_card(deck) if player_move == "hit"
     player_value = calculate_value(player_cards)
-    prompt "You now have " + + player_cards.map { |card| card[1]}.join(', ')
+    prompt "You now have " + player_cards.map { |card| card[1]}.join(', ')
     prompt "Your value is: #{player_value}"
     break if busted?(player_value)
   end
@@ -142,6 +142,9 @@ dealer_value = calculate_value(dealer_cards)
 player_value = calculate_value(player_cards)
 
 puts
+prompt "You have #{player_cards.map { |card| card[1]}.join(', ')}, Your value is: #{player_value}"
+prompt "Dealer has #{dealer_cards.map { |card| card[1]}.join(', ')}. Dealer's value is: #{dealer_value}"
+
 print_result(player_value, dealer_value)
 
 #binding.pry
