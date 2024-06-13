@@ -18,5 +18,20 @@ Pseudo Code
 2. deal card
    - return array
      - Suit and card
-3. Player Turn: Hit or stay
-   
+10. Player Turn: Hit or stay
+
+Bonus Feature Ideas:
+
+- symbols for suits
+- ascii cards
+- display hard and soft values when player has ace 
+  - eg. 7 (or 17)
+- change values
+  - 21 -> 31
+  - dealer stays value
+  - make constants
+- Add rounds
+  - first to x amount of points is winner
+- include rules and a proper intro
+  - personalize game
+- 
