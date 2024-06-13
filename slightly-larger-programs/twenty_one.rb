@@ -39,13 +39,13 @@ def calculate_value(cards)
 
   sum = 0
   values.each do |value|
-    if value == "A"
-      sum += 11
-    elsif value.to_i == 0
-      sum += 10
-    else
-      sum += value.to_i
-    end
+    sum += if value == "A"
+             11
+           elsif value.to_i == 0
+             10
+           else
+             value.to_i
+           end
   end
 
   values.select { |value| value == "A" }.count.times do
@@ -111,15 +111,13 @@ def player_turn(deck, player_cards, player_value)
 end
 
 def dealer_turn(deck, dealer_cards, dealer_value)
-  puts
   prompt "The dealer's facedown card was #{dealer_cards[1][1]}"
   loop do
     prompt "The dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     dealer_value = calculate_value(dealer_cards)
-    prompt "The dealer's value is #{calculate_value(dealer_cards)}"
-    if busted?(dealer_value)
-      break
-    elsif dealer_stay?(dealer_value)
+    prompt "The dealer's value is #{dealer_value}"
+    break if busted?(dealer_value)
+    if dealer_stay?(dealer_value)
       prompt "Dealer stays. Their value is #{calculate_value(dealer_cards)}"
       break
     else
@@ -163,6 +161,7 @@ loop do
 
   player_turn(deck, player_cards, player_value)
   player_value = calculate_value(player_cards)
+  puts
   dealer_turn(deck, dealer_cards, dealer_value) unless busted?(player_value)
 
   dealer_value = calculate_value(dealer_cards)
