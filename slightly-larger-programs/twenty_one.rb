@@ -169,11 +169,14 @@ loop do
   dealer_value = calculate_value(dealer_cards)
   player_value = calculate_value(player_cards)
 
-  puts
-  prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}. Your value is: #{player_value}"
-  prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}. Dealer's value is: #{dealer_value}"
+  unless busted?(player_value) || busted?(dealer_value)
+    puts
+    prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}. Your value is: #{player_value}"
+    prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}. Dealer's value is: #{dealer_value}"
+  end
 
   print_result(player_value, dealer_value)
+
   break unless play_again?
 end
 
