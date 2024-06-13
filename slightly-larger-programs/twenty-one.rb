@@ -46,15 +46,22 @@ player_cards = [deal_card(deck), deal_card(deck)]
 
 player_value = calculate_value(player_cards)
 
-puts "Dealer has: #{dealer_cards[0][1]} and unknown card"
+puts "Dealer's upcard is: #{dealer_cards[0][1]}"
 puts "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
 puts "Your value is: #{player_value}"
 
+answer = nil
 loop do
   puts "hit or stay?"
   answer = gets.chomp
   break if answer == "stay" || busted?(player_value)
   player_cards << deal_card(deck) if answer == "hit"
-
-  puts "Your value is now #{calculate_value(player_cards)}"
+  player_value = calculate_value(player_cards)
+  puts "You now have " + player_cards.map { |card| card[1]}.join(', ').insert(-2, "and ")
+  puts "Your value is: #{player_value}"
+  if busted?(player_value)
+    puts "You busted. Dealer wins."
+    break
+  end
 end
+
