@@ -35,7 +35,7 @@ def deal_card(deck)
 end
 
 def calculate_value(cards)
-  values = cards.map { |card| card[1]}
+  values = cards.map { |card| card[1] }
 
   sum = 0
   values.each do |value|
@@ -104,7 +104,7 @@ def player_turn(deck, player_cards, player_value)
     break if player_move == "stay"
     player_cards << deal_card(deck) if player_move == "hit"
     player_value = calculate_value(player_cards)
-    prompt "You now have " + player_cards.map { |card| card[1]}.join(', ')
+    prompt "You now have #{player_cards.map { |card| card[1] }.join(', ')}"
     prompt "Your value is: #{player_value}"
     break if busted?(player_value)
   end
@@ -126,7 +126,7 @@ def dealer_turn(deck, dealer_cards, dealer_value)
       prompt "The dealer has to take a card"
       sleep 3
       dealer_cards << deal_card(deck)
-      prompt "The dealer has " + dealer_cards.map { |card| card[1]}.join(', ')
+      prompt "The dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     end
   end
 end
@@ -146,12 +146,11 @@ loop do
   puts
 
   deck = {
-          H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-          D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-          C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-          S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
-          }
-
+    H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+    D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+    C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+    S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+  }
 
   dealer_cards = [deal_card(deck), deal_card(deck)]
   player_cards = [deal_card(deck), deal_card(deck)]
@@ -171,12 +170,11 @@ loop do
   player_value = calculate_value(player_cards)
 
   puts
-  prompt "You have #{player_cards.map { |card| card[1]}.join(', ')}. Your value is: #{player_value}"
-  prompt "Dealer has #{dealer_cards.map { |card| card[1]}.join(', ')}. Dealer's value is: #{dealer_value}"
+  prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}. Your value is: #{player_value}"
+  prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}. Dealer's value is: #{dealer_value}"
 
   print_result(player_value, dealer_value)
   break unless play_again?
 end
 
 prompt "Thanks for playing! Goodbye!"
-#binding.pry
