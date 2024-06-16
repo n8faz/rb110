@@ -33,6 +33,12 @@ def yes_or_no?(answer)
   end
 end
 
+def play?
+  prompt MESSAGES['play?']
+  answer = answer()
+  answer
+end
+
 def deal_card(deck)
   suit = deck.keys.sample
   value = deck[suit].sample
@@ -208,59 +214,61 @@ loop do
 
   prompt "Let's play 21!"
   prompt MESSAGES['points'] + "#{POINTS_TO_WIN} is the winner!"
+  play = play?
 
   puts
+  if play == 'yes'
+    score = {player: 0, dealer: 0}
 
-  score = {player: 0, dealer: 0}
+    loop do
+      clear_screen
 
-  loop do
-    clear_screen
+      print_score(score)
 
-    print_score(score)
+      deck = {
+        H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+        D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+        C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+        S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+      }
 
-    deck = {
-      H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-      D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-      C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-      S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
-    }
+      dealer_cards = [deal_card(deck), deal_card(deck)]
+      player_cards = [deal_card(deck), deal_card(deck)]
 
-    dealer_cards = [deal_card(deck), deal_card(deck)]
-    player_cards = [deal_card(deck), deal_card(deck)]
+      dealer_value = calculate_value(dealer_cards)
+      player_value = calculate_value(player_cards)
 
-    dealer_value = calculate_value(dealer_cards)
-    player_value = calculate_value(player_cards)
-
-    puts
-    prompt "Dealer's upcard is: #{dealer_cards[0][1]}"
-    prompt "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
-    prompt "Your value is: #{player_value}"
-
-    player_turn(deck, player_cards, player_value)
-    player_value = calculate_value(player_cards)
-    puts
-    dealer_turn(deck, dealer_cards, dealer_value) unless busted?(player_value)
-
-    dealer_value = calculate_value(dealer_cards)
-    player_value = calculate_value(player_cards)
-
-    unless busted?(player_value) || busted?(dealer_value)
       puts
-      prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}"
+      prompt "Dealer's upcard is: #{dealer_cards[0][1]}"
+      prompt "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
       prompt "Your value is: #{player_value}"
-      prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
-      prompt "Dealer's value is: #{dealer_value}"
+
+      player_turn(deck, player_cards, player_value)
+      player_value = calculate_value(player_cards)
       puts
+      dealer_turn(deck, dealer_cards, dealer_value) unless busted?(player_value)
+
+      dealer_value = calculate_value(dealer_cards)
+      player_value = calculate_value(player_cards)
+
+      unless busted?(player_value) || busted?(dealer_value)
+        puts
+        prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}"
+        prompt "Your value is: #{player_value}"
+        prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
+        prompt "Dealer's value is: #{dealer_value}"
+        puts
+      end
+
+      print_result(player_value, dealer_value)
+      puts
+      score = keep_score(player_value, dealer_value, score)
+      print_score(score)
+
+      break if game_over?(score) || next_round? == 'no'
     end
-
-    print_result(player_value, dealer_value)
-    puts
-    score = keep_score(player_value, dealer_value, score)
-    print_score(score)
-
-    break if game_over?(score) || next_round? == 'no'
   end
-  
+
   break unless play_again?
 end
 
