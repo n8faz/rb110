@@ -35,7 +35,6 @@ end
 
 def play?
   prompt MESSAGES['play?']
-  answer = answer()
   answer
 end
 
@@ -165,14 +164,9 @@ end
 def keep_score(player, dealer, score)
   result = detect_result(player, dealer)
 
-  case result
-  when :dealer_busted
+  if result == :player || result == :dealer_busted
     score[:player] += 1
-  when :player_busted
-    score[:dealer] += 1
-  when :player
-    score[:player] += 1
-  when :dealer
+  elsif result == :dealer || result == :player_busted
     score[:dealer] += 1
   end
 
@@ -191,7 +185,6 @@ end
 
 def next_round?
   prompt MESSAGES['next_round?']
-  answer = answer()
   answer
 end
 
