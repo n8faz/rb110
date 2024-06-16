@@ -71,16 +71,33 @@ def compare_values(player, dealer)
   end
 end
 
+def detect_result(player_value, dealer_value)
+  if player_value > 21
+    :player_busted
+  elsif dealer_value > 21
+    :dealer_busted
+  elsif dealer_value < player_value
+    :player
+  elsif dealer_value > player_value
+    :dealer
+  else
+    :push
+  end
+end
+
 def print_result(player, dealer)
-  if busted?(dealer)
+  result = detect_result(player, dealer)
+
+  case result
+  when :dealer_busted
     prompt MESSAGES['dealer_bust']
-  elsif busted?(player)
+  when :player_busted
     prompt MESSAGES['player_bust']
-  elsif compare_values(player, dealer) == 'player'
+  when :player
     prompt MESSAGES['player_win']
-  elsif compare_values(player, dealer) == 'dealer'
+  when :dealer
     prompt MESSAGES['dealer_win']
-  elsif compare_values(player, dealer) == 'push'
+  when :push
     prompt MESSAGES['push']
   end
 end
@@ -150,13 +167,22 @@ def play_again?
 end
 
 def keep_score(player, dealer, score)
-  if compare_values(player, dealer) == 'player'
+  result = detect_result(player, dealer)
+
+  case result
+  when :dealer_busted
     score[:player] += 1
-  elsif compare_values(player, dealer) == 'dealer'
+  when :player_busted
+    score[:dealer] += 1
+  when :player
+    score[:player] += 1
+  when :dealer
     score[:dealer] += 1
   end
+
   score
 end
+
 
 def print_score(score)
   game_over?(score)? (prompt MESSAGES['final_score']) : (prompt MESSAGES['current_score'])
@@ -234,6 +260,7 @@ loop do
 
     break if game_over?(score) || next_round? == 'no'
   end
+  
   break unless play_again?
 end
 
