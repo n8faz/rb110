@@ -1,0 +1,8 @@
+invalid_choice: "Invalid Choice. Please specify Yes or No"
+dealer_bust: "Dealer busted. You won!"
+player_bust: "You busted. Dealer wins"
+player_win: "You won!"
+dealer_win: "Dealer wins"
+push: "It's a push."
+hit_or_stay?: "hit or stay? type 'h' to hit or 's' to stay"
+invalid_hit_or_stay: "Invalid answer. Please enter '(h)it' or '(s)tay'"

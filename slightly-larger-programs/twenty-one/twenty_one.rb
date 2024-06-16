@@ -20,7 +20,7 @@ def answer
     answer = gets.chomp
     answer = yes_or_no?(answer)
     break if answer == 'no' || answer == 'yes'
-    prompt "Invalid Choice. Please specify Yes or No"
+    prompt MESSAGES['invalid_choice']
   end
   answer
 end
@@ -73,15 +73,15 @@ end
 
 def print_result(player, dealer)
   if busted?(dealer)
-    prompt "Dealer busted. You won"
+    prompt MESSAGES['dealer_bust']
   elsif busted?(player)
-    prompt "You busted. Dealer wins"
+    prompt MESSAGES['player_bust']
   elsif compare_values(player, dealer) == 'player'
-    prompt "You won!"
+    prompt MESSAGES['player_win']
   elsif compare_values(player, dealer) == 'dealer'
-    prompt "Dealer wins"
+    prompt MESSAGES['dealer_win']
   elsif compare_values(player, dealer) == 'push'
-    prompt "It's a push."
+    prompt MESSAGES['push']
   end
 end
 
@@ -96,10 +96,10 @@ end
 def hit_or_stay?
   answer = nil
   loop do
-    prompt "hit or stay?"
+    prompt MESSAGES['hit_or_stay?']
     answer = gets.chomp
     break if answer == "stay" || answer == "hit"
-    prompt "Invalid answer. Please enter 'hit' or 'stay'"
+    prompt MESSAGES['invalid_hit_or_stay']
   end
   answer
 end
