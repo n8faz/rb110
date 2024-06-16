@@ -97,9 +97,16 @@ def hit_or_stay?
   answer = nil
   loop do
     prompt MESSAGES['hit_or_stay?']
-    answer = gets.chomp
-    break if answer == "stay" || answer == "hit"
-    prompt MESSAGES['invalid_hit_or_stay']
+    answer = gets.chomp.downcase
+    if answer.start_with?('s')
+      answer = 'stay'
+      break
+    elsif answer.start_with?('h')
+      answer = 'hit'
+      break
+    else
+      prompt MESSAGES['invalid_hit_or_stay']
+    end
   end
   answer
 end
@@ -107,10 +114,13 @@ end
 def player_turn(deck, player_cards, player_value)
   loop do
     player_move = hit_or_stay?
-    break if player_move == "stay"
+    if player_move == "stay"
+      prompt "You stay. Your value is: #{player_value}"
+      break
+    end
     player_cards << deal_card(deck) if player_move == "hit"
     player_value = calculate_value(player_cards)
-    prompt "You now have #{player_cards.map { |card| card[1] }.join(', ')}"
+    prompt "You hit. You now have #{player_cards.map { |card| card[1] }.join(', ')}"
     prompt "Your value is: #{player_value}"
     break if busted?(player_value)
   end
