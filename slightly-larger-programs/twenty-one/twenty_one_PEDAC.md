@@ -34,4 +34,4 @@ Bonus Feature Ideas:
   - first to x amount of points is winner
 - include rules and a proper intro
   - personalize game
-- 
+- yaml file

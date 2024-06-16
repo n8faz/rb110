@@ -1,4 +1,10 @@
 require "pry"
+require "yaml"
+
+MESSAGES = YAML.load_file('twenty_one_messages.yml')
+SCORE = 21
+DEALER_STAY_AT = 17
+POINTS_TO_WIN = 5
 
 def clear_screen
   system "clear"
