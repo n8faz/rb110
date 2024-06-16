@@ -61,26 +61,16 @@ def calculate_value(cards)
   end
 
   values.select { |value| value == "A" }.count.times do
-    sum -= 10 if sum > 21
+    sum -= 10 if sum > SCORE
   end
 
   sum
 end
 
-def compare_values(player, dealer)
-  if player > dealer
-    'player'
-  elsif dealer > player
-    'dealer'
-  elsif player == dealer
-    'push'
-  end
-end
-
 def detect_result(player_value, dealer_value)
-  if player_value > 21
+  if player_value > SCORE
     :player_busted
-  elsif dealer_value > 21
+  elsif dealer_value > SCORE
     :dealer_busted
   elsif dealer_value < player_value
     :player
@@ -109,11 +99,11 @@ def print_result(player, dealer)
 end
 
 def busted?(total)
-  total > 21
+  total > SCORE
 end
 
 def dealer_stay?(total)
-  total >= 17
+  total >= DEALER_STAY_AT
 end
 
 def hit_or_stay?
@@ -157,7 +147,7 @@ def dealer_turn(deck, dealer_cards, dealer_value)
     prompt "The dealer's value is #{dealer_value}"
     break if busted?(dealer_value)
     if dealer_stay?(dealer_value)
-      prompt "Dealer stays. Their value is #{calculate_value(dealer_cards)}"
+      prompt "Dealer stays. Their value is #{dealer_value}"
       break
     else
       prompt "The dealer has to take a card..."
@@ -189,9 +179,8 @@ def keep_score(player, dealer, score)
   score
 end
 
-
 def print_score(score)
-  game_over?(score)? (prompt MESSAGES['final_score']) : (prompt MESSAGES['current_score'])
+  game_over?(score) ? (prompt MESSAGES['final_score']) : (prompt MESSAGES['current_score'])
   prompt "You: #{score[:player]}"
   prompt "Dealer: #{score[:dealer]}"
 end
@@ -201,7 +190,6 @@ def game_over?(score)
 end
 
 def next_round?
-  answer = nil
   prompt MESSAGES['next_round?']
   answer = answer()
   answer
@@ -218,7 +206,7 @@ loop do
 
   puts
   if play == 'yes'
-    score = {player: 0, dealer: 0}
+    score = { player: 0, dealer: 0 }
 
     loop do
       clear_screen
