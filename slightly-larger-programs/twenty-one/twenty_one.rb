@@ -5,7 +5,7 @@ MESSAGES = YAML.load_file('twenty_one_messages.yml')
 SCORE = 21
 DEALER_STAY_AT = 17
 POINTS_TO_WIN = 5
-SYMBOLS = {H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660"}
+SYMBOLS = {H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660", X: 'X' }
 
 def clear_screen
   system "clear"
@@ -46,6 +46,10 @@ def deal_card(deck)
   [suit, value]
 end
 
+def hide_card(cards)
+  [cards[0], [:X, 'X']]
+end
+
 def display_cards_one(cards)
   size = cards.size
   suits = []
@@ -56,20 +60,32 @@ def display_cards_one(cards)
     values << card[1]
   end
 
-  puts "   " + "┌────────┐     " * size
-  puts "   " + "%s              " * size % values
-  puts "   " + "|        |     " * size
-  puts "   " + "|   %s    |     " * size % suits
-  puts "   " + "|        |     " * size
-  puts "   " + "        %s      " * size % values
-  puts "   " + "└────────┘     " * size
+  puts "   " + "┌───────┐     " * size
+  puts "   " + " %s            " * size % values
+  puts "   " + "|       |     " * size
+  puts "   " + "|   %s   |     " * size % suits
+  puts "   " + "|       |     " * size
+  puts "   " + "       %s      " * size % values
+  puts "   " + "└───────┘     " * size
 end
 
-def display_all_cards(player_cards, dealer_cards)
-  puts "******** DEALER CARDS ********"
-  display_cards_one(dealer_cards)
-  puts "******** PLAYER CARDS *********"
+def display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hide)
+  puts MESSAGES['dealer_cards']
+  display_dealer_hand(dealer_cards, dealer_value, hide)
+  puts
+  puts MESSAGES['player_cards']
   display_cards_one(player_cards)
+  puts "Player Value: #{player_value}"
+end
+
+def display_dealer_hand(dealer_cards, dealer_value, hide)
+  if hide
+    display_cards_one(hide_card(dealer_cards))
+    prompt "Dealer Value: #{dealer_cards[0][1]}"
+  else
+    display_cards_one(dealer_cards)
+    prompt "Dealer Value: #{dealer_value}"
+  end
 end
 
 def calculate_value(cards)
@@ -152,7 +168,7 @@ end
 
 def player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
   loop do
-    display_board(score, player_cards, dealer_cards, player_value, dealer_value)
+    display_board(score, player_cards, dealer_cards, player_value, dealer_value, true)
     player_move = hit_or_stay?
     if player_move == "stay"
       prompt "You stay. Your value is: #{player_value}"
@@ -167,10 +183,9 @@ def player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, sc
 end
 
 def dealer_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
-  display_board(score, player_cards, dealer_cards, player_value, dealer_value)
+  display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
   prompt "The dealer's facedown card was #{dealer_cards[1][1]}"
   loop do
-    display_all_cards(player_cards, dealer_cards)
     prompt "The dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     dealer_value = calculate_value(dealer_cards)
     prompt "The dealer's value is #{dealer_value}"
@@ -203,10 +218,10 @@ def keep_score(player, dealer, score)
   score
 end
 
-def display_board(score, player_cards, dealer_cards, player_value, dealer_value)
+def display_board(score, player_cards, dealer_cards, player_value, dealer_value, hide)
   clear_screen
   print_score(score)
-  display_all_cards(player_cards, dealer_cards)
+  display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hide)
 
 end
 
@@ -278,7 +293,8 @@ loop do
         puts
       end
 
-      display_board(score, player_cards, dealer_cards, player_value, dealer_value)
+      display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
+      puts
       print_result(player_value, dealer_value)
       puts
       score = keep_score(player_value, dealer_value, score)
