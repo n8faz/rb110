@@ -5,6 +5,7 @@ MESSAGES = YAML.load_file('twenty_one_messages.yml')
 SCORE = 21
 DEALER_STAY_AT = 17
 POINTS_TO_WIN = 5
+SYMBOLS = {H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660"}
 
 def clear_screen
   system "clear"
@@ -43,6 +44,32 @@ def deal_card(deck)
   value = deck[suit].sample
   deck[suit].delete(value)
   [suit, value]
+end
+
+def display_cards_one(cards)
+  size = cards.size
+  suits = []
+  values = []
+
+  cards.each do |card|
+    suits << SYMBOLS[card[0]]
+    values << card[1]
+  end
+
+  puts "   " + "┌────────┐     " * size
+  puts "   " + "%s              " * size % values
+  puts "   " + "|        |     " * size
+  puts "   " + "|   %s    |     " * size % suits
+  puts "   " + "|        |     " * size
+  puts "   " + "        %s      " * size % values
+  puts "   " + "└────────┘     " * size
+end
+
+def display_all_cards(player_cards, dealer_cards)
+  puts "******** DEALER CARDS ********"
+  display_cards_one(dealer_cards)
+  puts "******** PLAYER CARDS *********"
+  display_cards_one(player_cards)
 end
 
 def calculate_value(cards)
@@ -123,8 +150,9 @@ def hit_or_stay?
   answer
 end
 
-def player_turn(deck, player_cards, player_value)
+def player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
   loop do
+    display_board(score, player_cards, dealer_cards, player_value, dealer_value)
     player_move = hit_or_stay?
     if player_move == "stay"
       prompt "You stay. Your value is: #{player_value}"
@@ -138,9 +166,11 @@ def player_turn(deck, player_cards, player_value)
   end
 end
 
-def dealer_turn(deck, dealer_cards, dealer_value)
+def dealer_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
+  display_board(score, player_cards, dealer_cards, player_value, dealer_value)
   prompt "The dealer's facedown card was #{dealer_cards[1][1]}"
   loop do
+    display_all_cards(player_cards, dealer_cards)
     prompt "The dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     dealer_value = calculate_value(dealer_cards)
     prompt "The dealer's value is #{dealer_value}"
@@ -171,6 +201,13 @@ def keep_score(player, dealer, score)
   end
 
   score
+end
+
+def display_board(score, player_cards, dealer_cards, player_value, dealer_value)
+  clear_screen
+  print_score(score)
+  display_all_cards(player_cards, dealer_cards)
+
 end
 
 def print_score(score)
@@ -224,10 +261,10 @@ loop do
       prompt "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
       prompt "Your value is: #{player_value}"
 
-      player_turn(deck, player_cards, player_value)
+      player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
       player_value = calculate_value(player_cards)
       puts
-      dealer_turn(deck, dealer_cards, dealer_value) unless busted?(player_value)
+      dealer_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score) unless busted?(player_value)
 
       dealer_value = calculate_value(dealer_cards)
       player_value = calculate_value(player_cards)
@@ -241,6 +278,7 @@ loop do
         puts
       end
 
+      display_board(score, player_cards, dealer_cards, player_value, dealer_value)
       print_result(player_value, dealer_value)
       puts
       score = keep_score(player_value, dealer_value, score)
