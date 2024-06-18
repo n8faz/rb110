@@ -35,4 +35,5 @@ Bonus Feature Ideas:
 - include rules and a proper intro
   - personalize game
 - yaml file
-
+- exit loop and display when player hits 21
+  - do not give player option to hit or stay when they are at 21
