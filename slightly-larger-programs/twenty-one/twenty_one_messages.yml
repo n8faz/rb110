@@ -22,16 +22,26 @@ rules: " ***************** RULES *****************
 \n    - You will be able to see both your cards
 \n    - You will be able to see only one of the dealer's cards 
 \n 
-\n - The goal is to get to as close to 21 as possible without going over
-\n - Anything over 21 is considered a 'bust' and you lose
-\n 
 \n - The card values are as follows:
 \n    - 2-10 are worth face value
 \n    - J, Q, K are worth 10
 \n    - A is worth 1 or 11, depending on whether your hand exceeds 21
+\n 
+\n - The goal is to get to as close to 21 as possible without going over
+\n - Anything over 21 is considered a 'bust' and you lose
 \n
-\n - The dealer must stay when they hit 17
-\n - If the dealer goes over 21 they bust and you win
+\n - You go first. You can choose to either 'hit' or 'stay'
+\n    - When you hit you are dealt another card
+\n    - Remember, if you go over 21 that is a 'bust' and you lose
+\n    - You can keep hitting to try and get as close to 21 as possible
+\n    - Your other option is to stay
+\n    - When you stay your turn is over and it becomes the dealer's turn
+\n   
+\n - The dealer's turn starts with their second card being revealed
+\n    - If the total of the dealer's two cards is less than 17 they must hit
+\n    - The dealer must stay when they reach 17 
+\n    - If the dealer goes over 21 they bust and you win
+\n
 \n - If neither of you bust, your scores are compared
 \n - Whoever is closest to 21 without going over wins the hand
 \n - A 'push' is when you and the dealer have the same score 

@@ -122,6 +122,7 @@ def display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hi
   puts MESSAGES['player_cards']
   display_cards_one(player_cards)
   prompt "Player Value: #{display_value(player_cards)}"
+  puts
 end
 
 def display_dealer_hand(dealer_cards, dealer_value, hide)
@@ -130,7 +131,7 @@ def display_dealer_hand(dealer_cards, dealer_value, hide)
     prompt "Dealer Value: #{dealer_cards[0][1]}"
   else
     display_cards_one(dealer_cards)
-    prompt "Dealer Value: #{display_value(dealer_cards)}"
+    prompt "Dealer Value: #{dealer_value}"
   end
 end
 
