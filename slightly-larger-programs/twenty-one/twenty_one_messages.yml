@@ -13,3 +13,13 @@ next_round?: "Are you ready for the next round? (Y to continue or N to exit game
 play?: "Shall we play? (Y for yes N for no)"
 dealer_cards: "********** DEALER CARDS **********"
 player_cards: "********** PLAYER CARDS **********"
+read_rules?: "Would you like to read the rules?"
+rules: " The rules are as follows:
+\n
+\n We start with a standard 52 card deck
+\n The goal is to get to as close to 21 as possible without going over.
+\n Anything over 21 is considered a 'bust' and you lose
+\n The card values are as follows:
+\n  - 2-10 are worth face value
+\n  - J, Q, K are worth 10
+\n  - A is worth 1 or 11, depending on whether your hand exceeds 21"

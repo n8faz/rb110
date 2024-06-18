@@ -39,6 +39,52 @@ def play?
   answer
 end
 
+def play_again?
+  prompt "Play again?"
+  answer = answer()
+  true if answer == 'yes'
+end
+
+def game_over?(score)
+  score[:player] == POINTS_TO_WIN || score[:dealer] == POINTS_TO_WIN
+end
+
+def next_round?
+  prompt MESSAGES['next_round?']
+  answer
+end
+
+def read_rules?
+  prompt MESSAGES['read_rules?']
+  answer
+end
+
+def busted?(total)
+  total > SCORE
+end
+
+def dealer_stay?(total)
+  total >= DEALER_STAY_AT
+end
+
+def hit_or_stay?
+  answer = nil
+  loop do
+    prompt MESSAGES['hit_or_stay?']
+    answer = gets.chomp.downcase
+    if answer.start_with?('s')
+      answer = 'stay'
+      break
+    elsif answer.start_with?('h')
+      answer = 'hit'
+      break
+    else
+      prompt MESSAGES['invalid_hit_or_stay']
+    end
+  end
+  answer
+end
+
 def deal_card(deck)
   suit = deck.keys.sample
   value = deck[suit].sample
@@ -61,7 +107,7 @@ def display_cards_one(cards)
   end
 
   puts "   " + "┌───────┐     " * size
-  puts "   " + " %s           " * size % values
+  puts "   " + " %s            " * size % values
   puts "   " + "|       |     " * size
   puts "   " + "|   %s   |     " * size % suits
   puts "   " + "|       |     " * size
@@ -172,32 +218,6 @@ def print_result(player, dealer)
   end
 end
 
-def busted?(total)
-  total > SCORE
-end
-
-def dealer_stay?(total)
-  total >= DEALER_STAY_AT
-end
-
-def hit_or_stay?
-  answer = nil
-  loop do
-    prompt MESSAGES['hit_or_stay?']
-    answer = gets.chomp.downcase
-    if answer.start_with?('s')
-      answer = 'stay'
-      break
-    elsif answer.start_with?('h')
-      answer = 'hit'
-      break
-    else
-      prompt MESSAGES['invalid_hit_or_stay']
-    end
-  end
-  answer
-end
-
 def player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
   loop do
     display_board(score, player_cards, dealer_cards, player_value, dealer_value, true)
@@ -232,12 +252,6 @@ def dealer_turn(deck, player_cards, dealer_cards, player_value, dealer_value, sc
   end
 end
 
-def play_again?
-  prompt "Play again?"
-  answer = answer()
-  true if answer == 'yes'
-end
-
 def keep_score(player, dealer, score)
   result = detect_result(player, dealer)
 
@@ -263,39 +277,27 @@ def print_score(score)
   prompt "Dealer: #{score[:dealer]}"
 end
 
-def game_over?(score)
-  score[:player] == POINTS_TO_WIN || score[:dealer] == POINTS_TO_WIN
-end
-
-def next_round?
-  prompt MESSAGES['next_round?']
-  answer
-end
-
-def read_rules?
-
+def display_rules
+  clear_screen
+  puts MESSAGES['rules']
+  prompt "Press Enter to continue"
+  gets.chomp
 end
 
 def print_intro
   prompt "Let's play 21!"
   prompt MESSAGES['points'] + "#{POINTS_TO_WIN} is the winner!"
-  prompt "Would you like to read the rules?"
-  answer
-  if answer == 'yes'
-
-  end
+  display_rules if read_rules? == 'yes'
 end
 
 # Program Start
 
 loop do
   clear_screen
-
-  prompt "Let's play 21!"
-  prompt MESSAGES['points'] + "#{POINTS_TO_WIN} is the winner!"
+  print_intro
   play = play?
-
   puts
+  
   if play == 'yes'
     score = { player: 0, dealer: 0 }
 
