@@ -61,7 +61,7 @@ def display_cards_one(cards)
   end
 
   puts "   " + "┌───────┐     " * size
-  puts "   " + " %s            " * size % values
+  puts "   " + " %s           " * size % values
   puts "   " + "|       |     " * size
   puts "   " + "|   %s   |     " * size % suits
   puts "   " + "|       |     " * size
@@ -75,7 +75,7 @@ def display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hi
   puts
   puts MESSAGES['player_cards']
   display_cards_one(player_cards)
-  puts "Player Value: #{player_value}"
+  prompt "Player Value: #{display_value(player_cards)}"
 end
 
 def display_dealer_hand(dealer_cards, dealer_value, hide)
@@ -84,7 +84,7 @@ def display_dealer_hand(dealer_cards, dealer_value, hide)
     prompt "Dealer Value: #{dealer_cards[0][1]}"
   else
     display_cards_one(dealer_cards)
-    prompt "Dealer Value: #{dealer_value}"
+    prompt "Dealer Value: #{display_value(dealer_cards)}"
   end
 end
 
@@ -106,6 +106,38 @@ def calculate_value(cards)
     sum -= 10 if sum > SCORE
   end
 
+  sum
+end
+
+def number_of_aces(values)
+  values.select { |value| value == 'A' }.count
+end
+
+def display_value(cards)
+  values = cards.map { |card| card[1] }
+  sum = 0
+
+  if values.include?('A')
+    values.each do |value|
+      sum += if value == 'A'
+              next
+             elsif value.to_i == 0
+              10
+             else
+              value.to_i
+             end
+      end
+
+    (number_of_aces(values) - 1).times { sum += 1 }
+
+    if (sum += 11) >= SCORE
+      sum = calculate_value(cards)
+    else
+      sum = "#{(sum - 10)} (or #{sum})"
+    end
+  else
+    sum = calculate_value(cards)
+  end
   sum
 end
 
@@ -238,6 +270,20 @@ end
 def next_round?
   prompt MESSAGES['next_round?']
   answer
+end
+
+def read_rules?
+
+end
+
+def print_intro
+  prompt "Let's play 21!"
+  prompt MESSAGES['points'] + "#{POINTS_TO_WIN} is the winner!"
+  prompt "Would you like to read the rules?"
+  answer
+  if answer == 'yes'
+
+  end
 end
 
 # Program Start
