@@ -96,6 +96,19 @@ def hide_card(cards)
   [cards[0], [:X, 'X']]
 end
 
+def display_intro
+  prompt "Let's play 21!"
+  display_rules if read_rules? == 'yes'
+  prompt MESSAGES['points'] + "#{POINTS_TO_WIN} points is the winner!"
+end
+
+def display_rules
+  clear_screen
+  puts MESSAGES['rules']
+  prompt "Press Enter to continue"
+  gets.chomp
+end
+
 def display_cards_one(cards)
   size = cards.size
   suits = []
@@ -140,29 +153,34 @@ def display_dealer_hand(dealer_cards, dealer_value, hide)
   end
 end
 
-def calculate_value(cards)
-  values = cards.map { |card| card[1] }
+def display_result(player, dealer)
+  result = detect_result(player, dealer)
 
-  sum = 0
-  values.each do |value|
-    sum += if value == "A"
-             11
-           elsif value.to_i == 0
-             10
-           else
-             value.to_i
-           end
+  case result
+  when :dealer_busted
+    prompt MESSAGES['dealer_bust']
+  when :player_busted
+    prompt MESSAGES['player_bust']
+  when :player
+    prompt MESSAGES['player_win']
+  when :dealer
+    prompt MESSAGES['dealer_win']
+  when :push
+    prompt MESSAGES['push']
   end
-
-  values.select { |value| value == "A" }.count.times do
-    sum -= 10 if sum > SCORE
-  end
-
-  sum
 end
 
-def number_of_aces(values)
-  values.select { |value| value == 'A' }.count
+def display_board(score, player_cards, dealer_cards, player_value, dealer_value, hide)
+  clear_screen
+  display_score(score)
+  display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hide)
+  puts MESSAGES['line']
+end
+
+def display_score(score)
+  game_over?(score) ? (prompt MESSAGES['final_score']) : (prompt MESSAGES['current_score'])
+  prompt "You: #{score[:player]}"
+  prompt "Dealer: #{score[:dealer]}"
 end
 
 def display_value(cards)
@@ -193,6 +211,31 @@ def display_value(cards)
   sum
 end
 
+def calculate_value(cards)
+  values = cards.map { |card| card[1] }
+
+  sum = 0
+  values.each do |value|
+    sum += if value == "A"
+             11
+           elsif value.to_i == 0
+             10
+           else
+             value.to_i
+           end
+  end
+
+  number_of_aces(values).times do
+    sum -= 10 if sum > SCORE
+  end
+
+  sum
+end
+
+def number_of_aces(values)
+  values.select { |value| value == 'A' }.count
+end
+
 def detect_result(player_value, dealer_value)
   if player_value > SCORE
     :player_busted
@@ -204,23 +247,6 @@ def detect_result(player_value, dealer_value)
     :dealer
   else
     :push
-  end
-end
-
-def print_result(player, dealer)
-  result = detect_result(player, dealer)
-
-  case result
-  when :dealer_busted
-    prompt MESSAGES['dealer_bust']
-  when :player_busted
-    prompt MESSAGES['player_bust']
-  when :player
-    prompt MESSAGES['player_win']
-  when :dealer
-    prompt MESSAGES['dealer_win']
-  when :push
-    prompt MESSAGES['push']
   end
 end
 
@@ -273,37 +299,11 @@ def keep_score(player, dealer, score)
   score
 end
 
-def display_board(score, player_cards, dealer_cards, player_value, dealer_value, hide)
-  clear_screen
-  print_score(score)
-  display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hide)
-  puts MESSAGES['line']
-end
-
-def print_score(score)
-  game_over?(score) ? (prompt MESSAGES['final_score']) : (prompt MESSAGES['current_score'])
-  prompt "You: #{score[:player]}"
-  prompt "Dealer: #{score[:dealer]}"
-end
-
-def display_rules
-  clear_screen
-  puts MESSAGES['rules']
-  prompt "Press Enter to continue"
-  gets.chomp
-end
-
-def print_intro
-  prompt "Let's play 21!"
-  display_rules if read_rules? == 'yes'
-  prompt MESSAGES['points'] + "#{POINTS_TO_WIN} points is the winner!"
-end
-
 # Program Start
 
 loop do
   clear_screen
-  print_intro
+  display_intro
   puts
   play = play?
   if play == 'yes'
@@ -312,7 +312,7 @@ loop do
     loop do
       clear_screen
 
-      print_score(score)
+      display_score(score)
 
       deck = {
         H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
@@ -338,10 +338,10 @@ loop do
 
       display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
       puts
-      print_result(player_value, dealer_value)
+      display_result(player_value, dealer_value)
       puts
       score = keep_score(player_value, dealer_value, score)
-      print_score(score)
+      display_score(score)
       puts
       break if game_over?(score) || next_round? == 'no'
     end
