@@ -5,7 +5,7 @@ MESSAGES = YAML.load_file('twenty_one_messages.yml')
 SCORE = 21
 DEALER_STAY_AT = 17
 POINTS_TO_WIN = 5
-SYMBOLS = {H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660", X: 'X' }
+SYMBOLS = { H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660", X: 'X' }
 
 def clear_screen
   system "clear"
@@ -109,6 +109,10 @@ def display_rules
   gets.chomp
 end
 
+def blank_space
+  "   "
+end
+
 def display_cards_one(cards)
   size = cards.size
   suits = []
@@ -119,16 +123,16 @@ def display_cards_one(cards)
     values << card[1]
   end
 
-  puts "   " + "┌───────┐     " * size
-  puts "   " + " %s            " * size % values
-  puts "   " + "|       |     " * size
-  puts "   " + "|   %s   |     " * size % suits
-  puts "   " + "|       |     " * size
-  puts "   " + "       %s      " * size % values
-  puts "   " + "└───────┘     " * size
+  puts blank_space + ("┌───────┐     " * size)
+  puts blank_space + (" %s            " * size % values)
+  puts blank_space + ("|       |     " * size)
+  puts blank_space + ("|   %s   |     " * size % suits)
+  puts blank_space + ("|       |     " * size)
+  puts blank_space + ("       %s      " * size % values)
+  puts blank_space + ("└───────┘     " * size)
 end
 
-def display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hide)
+def display_all_cards(player_cards, dealer_cards, dealer_value, hide)
   puts MESSAGES['dealer_cards']
   puts
   display_dealer_hand(dealer_cards, dealer_value, hide)
@@ -170,15 +174,19 @@ def display_result(player, dealer)
   end
 end
 
-def display_board(score, player_cards, dealer_cards, player_value, dealer_value, hide)
+def display_board(score, player_cards, dealer_cards, dealer_value, hide)
   clear_screen
   display_score(score)
-  display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hide)
+  display_all_cards(player_cards, dealer_cards, dealer_value, hide)
   puts MESSAGES['line']
 end
 
 def display_score(score)
-  game_over?(score) ? (prompt MESSAGES['final_score']) : (prompt MESSAGES['current_score'])
+  if game_over?(score)
+    prompt MESSAGES['final_score']
+  else
+    prompt MESSAGES['current_score']
+  end
   prompt "You: #{score[:player]}"
   prompt "Dealer: #{score[:dealer]}"
 end
@@ -190,19 +198,20 @@ def display_value(cards)
   if values.include?('A')
     values.each do |value|
       sum += if value == 'A'
-              next
+               next
              elsif value.to_i == 0
-              10
+               10
              else
-              value.to_i
+               value.to_i
              end
-      end
+    end
 
     (number_of_aces(values) - 1).times { sum += 1 }
 
-    if (sum += 11) >= SCORE
+    if (sum + 11) >= SCORE
       sum = calculate_value(cards)
     else
+      sum += 11
       sum = "#{(sum - 10)} (or #{sum})"
     end
   else
@@ -252,7 +261,7 @@ end
 
 def player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
   loop do
-    display_board(score, player_cards, dealer_cards, player_value, dealer_value, true)
+    display_board(score, player_cards, dealer_cards, dealer_value, true)
     puts
     player_move = hit_or_stay?
     if player_move == "stay"
@@ -267,10 +276,10 @@ def player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, sc
   end
 end
 
-def dealer_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
+def dealer_turn(deck, player_cards, dealer_cards, dealer_value, score)
   prompt "Revealing Dealer's Card..."
   sleep 3
-  display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
+  display_board(score, player_cards, dealer_cards, dealer_value, false)
   loop do
     dealer_value = calculate_value(dealer_cards)
     break if busted?(dealer_value)
@@ -282,7 +291,7 @@ def dealer_turn(deck, player_cards, dealer_cards, player_value, dealer_value, sc
       prompt "The dealer has to take a card..."
       sleep 3
       dealer_cards << deal_card(deck)
-      display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
+      display_board(score, player_cards, dealer_cards, dealer_value, false)
     end
   end
 end
@@ -336,7 +345,7 @@ loop do
       dealer_value = calculate_value(dealer_cards)
       player_value = calculate_value(player_cards)
 
-      display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
+      display_board(score, player_cards, dealer_cards, dealer_value, false)
       puts
       display_result(player_value, dealer_value)
       puts
