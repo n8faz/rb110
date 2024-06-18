@@ -117,10 +117,13 @@ end
 
 def display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hide)
   puts MESSAGES['dealer_cards']
+  puts
   display_dealer_hand(dealer_cards, dealer_value, hide)
   puts
   puts MESSAGES['player_cards']
+  puts
   display_cards_one(player_cards)
+  puts
   prompt "Player Value: #{display_value(player_cards)}"
   puts
 end
@@ -128,9 +131,11 @@ end
 def display_dealer_hand(dealer_cards, dealer_value, hide)
   if hide
     display_cards_one(hide_card(dealer_cards))
+    puts
     prompt "Dealer Value: #{dealer_cards[0][1]}"
   else
     display_cards_one(dealer_cards)
+    puts
     prompt "Dealer Value: #{dealer_value}"
   end
 end
@@ -222,6 +227,7 @@ end
 def player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
   loop do
     display_board(score, player_cards, dealer_cards, player_value, dealer_value, true)
+    puts
     player_move = hit_or_stay?
     if player_move == "stay"
       prompt "You stay. Your value is: #{player_value}"
@@ -229,26 +235,28 @@ def player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, sc
     end
     player_cards << deal_card(deck) if player_move == "hit"
     player_value = calculate_value(player_cards)
-    prompt "You hit. You now have #{player_cards.map { |card| card[1] }.join(', ')}"
-    prompt "Your value is: #{player_value}"
+    prompt "Dealing card..."
+    sleep 3
     break if busted?(player_value)
   end
 end
 
 def dealer_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
+  prompt "Revealing Dealer's Card..."
+  sleep 3
   display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
-  prompt "The dealer's facedown card was #{dealer_cards[1][1]}"
   loop do
-    prompt "The dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
     dealer_value = calculate_value(dealer_cards)
-    prompt "The dealer's value is #{dealer_value}"
     break if busted?(dealer_value)
     if dealer_stay?(dealer_value)
       prompt "Dealer stays. Their value is #{dealer_value}"
+      sleep 3
       break
     else
       prompt "The dealer has to take a card..."
+      sleep 3
       dealer_cards << deal_card(deck)
+      display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
     end
   end
 end
@@ -320,10 +328,6 @@ loop do
       player_value = calculate_value(player_cards)
 
       puts
-      prompt "Dealer's upcard is: #{dealer_cards[0][1]}"
-      prompt "You have: #{player_cards[0][1]} and #{player_cards[1][1]}"
-      prompt "Your value is: #{player_value}"
-
       player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
       player_value = calculate_value(player_cards)
       puts
@@ -338,7 +342,7 @@ loop do
       puts
       score = keep_score(player_value, dealer_value, score)
       print_score(score)
-
+      puts
       break if game_over?(score) || next_round? == 'no'
     end
   end
