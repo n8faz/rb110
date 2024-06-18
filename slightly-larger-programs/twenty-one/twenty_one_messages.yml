@@ -11,15 +11,30 @@ final_score: "Final Score: "
 current_score: "Current Score: "
 next_round?: "Are you ready for the next round? (Y to continue or N to exit game)"
 play?: "Shall we play? (Y for yes N for no)"
-dealer_cards: "********** DEALER CARDS **********"
-player_cards: "********** PLAYER CARDS **********"
+dealer_cards: " ***************** DEALER CARDS *****************"
+player_cards: " ***************** PLAYER CARDS *****************"
 read_rules?: "Would you like to read the rules?"
-rules: " The rules are as follows:
+rules: " ***************** RULES *****************
 \n
-\n We start with a standard 52 card deck
-\n The goal is to get to as close to 21 as possible without going over.
-\n Anything over 21 is considered a 'bust' and you lose
-\n The card values are as follows:
-\n  - 2-10 are worth face value
-\n  - J, Q, K are worth 10
-\n  - A is worth 1 or 11, depending on whether your hand exceeds 21"
+\n - We start with a standard 52 card deck
+\n - You will be playing against the dealer
+\n - Both you and the dealer are dealt two cards
+\n    - You will be able to see both your cards
+\n    - You will be able to see only one of the dealer's cards 
+\n 
+\n - The goal is to get to as close to 21 as possible without going over
+\n - Anything over 21 is considered a 'bust' and you lose
+\n 
+\n - The card values are as follows:
+\n    - 2-10 are worth face value
+\n    - J, Q, K are worth 10
+\n    - A is worth 1 or 11, depending on whether your hand exceeds 21
+\n
+\n - The dealer must stay when they hit 17
+\n - If the dealer goes over 21 they bust and you win
+\n - If neither of you bust, your scores are compared
+\n - Whoever is closest to 21 without going over wins the hand
+\n - A 'push' is when you and the dealer have the same score 
+\n - When there is a push no one wins the hand
+\n "
+line: "-------------------------------------------------"

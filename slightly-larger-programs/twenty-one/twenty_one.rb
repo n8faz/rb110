@@ -268,7 +268,7 @@ def display_board(score, player_cards, dealer_cards, player_value, dealer_value,
   clear_screen
   print_score(score)
   display_all_cards(player_cards, dealer_cards, player_value, dealer_value, hide)
-
+  puts MESSAGES['line']
 end
 
 def print_score(score)
@@ -286,8 +286,8 @@ end
 
 def print_intro
   prompt "Let's play 21!"
-  prompt MESSAGES['points'] + "#{POINTS_TO_WIN} is the winner!"
   display_rules if read_rules? == 'yes'
+  prompt MESSAGES['points'] + "#{POINTS_TO_WIN} points is the winner!"
 end
 
 # Program Start
@@ -295,9 +295,8 @@ end
 loop do
   clear_screen
   print_intro
-  play = play?
   puts
-  
+  play = play?
   if play == 'yes'
     score = { player: 0, dealer: 0 }
 
@@ -331,15 +330,6 @@ loop do
 
       dealer_value = calculate_value(dealer_cards)
       player_value = calculate_value(player_cards)
-
-      unless busted?(player_value) || busted?(dealer_value)
-        puts
-        prompt "You have #{player_cards.map { |card| card[1] }.join(', ')}"
-        prompt "Your value is: #{player_value}"
-        prompt "Dealer has #{dealer_cards.map { |card| card[1] }.join(', ')}"
-        prompt "Dealer's value is: #{dealer_value}"
-        puts
-      end
 
       display_board(score, player_cards, dealer_cards, player_value, dealer_value, false)
       puts
