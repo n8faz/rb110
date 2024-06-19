@@ -6,6 +6,8 @@ SCORE = 21
 DEALER_STAY_AT = 17
 POINTS_TO_WIN = 5
 SYMBOLS = { H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660", X: 'X' }
+CARD_SUITS =[:H, :D, :C, :S]
+CARD_VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 
 def clear_screen
   system "clear"
@@ -83,6 +85,12 @@ def hit_or_stay?
     end
   end
   answer
+end
+
+def initialize_deck
+  deck = {}
+  CARD_SUITS.each { |suit| deck[suit] = CARD_VALUES }
+  deck
 end
 
 def deal_card(deck)
@@ -323,12 +331,7 @@ loop do
 
       display_score(score)
 
-      deck = {
-        H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-        S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
-      }
+      deck = initialize_deck
 
       dealer_cards = [deal_card(deck), deal_card(deck)]
       player_cards = [deal_card(deck), deal_card(deck)]
@@ -340,7 +343,7 @@ loop do
       player_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score)
       player_value = calculate_value(player_cards)
       puts
-      dealer_turn(deck, player_cards, dealer_cards, player_value, dealer_value, score) unless busted?(player_value)
+      dealer_turn(deck, player_cards, dealer_cards, dealer_value, score) unless busted?(player_value)
 
       dealer_value = calculate_value(dealer_cards)
       player_value = calculate_value(player_cards)
