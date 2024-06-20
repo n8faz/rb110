@@ -22,18 +22,8 @@ Pseudo Code
 
 Bonus Feature Ideas:
 
-- symbols for suits
-- ascii cards
-- display hard and soft values when player has ace 
-  - eg. 7 (or 17)
-- change values
-  - 21 -> 31
-  - dealer stays value
-  - make constants
 - Add rounds
   - first to x amount of points is winner
-- include rules and a proper intro
   - personalize game
-- yaml file
 - exit loop and display when player hits 21
   - do not give player option to hit or stay when they are at 21

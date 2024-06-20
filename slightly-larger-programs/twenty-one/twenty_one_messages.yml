@@ -45,6 +45,7 @@ rules: "****************** RULES ******************
 \n - Whoever is closest to 21 without going over wins the hand
 \n - A 'push' is when you and the dealer have the same score 
 \n - When there is a push no one wins the hand
+\n
 \n => Press Enter to continue "
 line: "-------------------------------------------------"
 play_again?: "Would you like to play again?"

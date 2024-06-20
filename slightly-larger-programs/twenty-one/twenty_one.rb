@@ -119,10 +119,6 @@ def display_rules
   gets.chomp
 end
 
-def blank_space
-  "   "
-end
-
 def display_cards_one(cards)
   size = cards.size
   suits = []
