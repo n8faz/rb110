@@ -16,9 +16,8 @@ player_cards: " ***************** PLAYER CARDS *****************"
 read_rules?: "Would you like to read the rules?"
 rules: " ***************** RULES *****************
 \n
-\n - We start with a standard 52 card deck
 \n - You will be playing against the dealer
-\n - Both you and the dealer are dealt two cards
+\n - Both you and the dealer are dealt two cards from a standard 52 card deck
 \n    - You will be able to see both your cards
 \n    - You will be able to see only one of the dealer's cards 
 \n 
@@ -27,7 +26,7 @@ rules: " ***************** RULES *****************
 \n    - J, Q, K are worth 10
 \n    - A is worth 1 or 11, depending on whether your hand exceeds 21
 \n 
-\n - The goal is to get to as close to 21 as possible without going over
+\n - The goal is to get as close to 21 as possible without going over
 \n - Anything over 21 is considered a 'bust' and you lose
 \n
 \n - You go first. You can choose to either 'hit' or 'stay'

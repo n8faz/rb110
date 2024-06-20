@@ -1,5 +1,7 @@
 SYMBOLS = {H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660"}
 SCORE = 21
+CARD_SUITS =[:H, :D, :C, :S]
+CARD_VALUES = ['A ', '2 ', '3 ', '4 ', '5 ', '6 ', '7 ', '8 ', '9 ', '10', 'J ', 'Q ', 'K ']
 
 def blank_space
   "     "
@@ -47,11 +49,11 @@ def display_cards_one(cards)
   end
 
   puts "   " + "┌───────┐     " * size
-  puts "   " + "%s             " * size % values
+  puts "   " + "|%s     |     " * size % values
   puts "   " + "|       |     " * size
   puts "   " + "|   %s   |     " * size % suits
   puts "   " + "|       |     " * size
-  puts "   " + "       %s      " * size % values
+  puts "   " + "|     %s|     " * size % values
   puts "   " + "└───────┘     " * size
 end
 
@@ -72,22 +74,6 @@ def display_cards_two(cards)
   puts "|        |     " * size
   puts "       %s       " * size % values
   puts "└────────┘     " * size
-end
-
-def display_cards_three(cards)
-  size = cards.size
-  suits = []
-  values = []
-
-  cards.each do |card|
-    suits << SYMBOLS[card[0]]
-    values << card[1]
-  end
-
-  cards.each do |card|
-    display_card(card)
-  end
-
 end
 
 
@@ -136,9 +122,10 @@ def display_value(cards)
 
     (number_of_aces(values) - 1).times { sum += 1 }
 
-    if (sum += 11) >= SCORE
+    if (sum + 11) >= SCORE
       sum = calculate_value(cards)
     else
+      sum += 11
       sum = "#{(sum - 10)} (or #{sum})"
     end
   else
@@ -151,36 +138,38 @@ def number_of_aces(values)
   values.select { |value| value == 'A' }.count
 end
 
-def display_value_two(cards)
-  values = cards.map { |card| card[1] }
-  sum = calculate_value(cards)
-
-  if number_of_aces(values) == 1
-    "#{sum -= 11} (or #{sum})"
-  else
-    sum
+def initialize_deck
+  deck = {}
+  CARD_SUITS.each do |suit|
+    deck[suit] = []
+    CARD_VALUES.each { |value| deck[suit] << value }
   end
+  deck
 end
 
+deck = initialize_deck
 
-deck = {
-  H: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-  D: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-  C: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-  S: ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
-}
 
-cards = [deal_card(deck), deal_card(deck)]
+cards = [[:H, '10'], deal_card(deck), deal_card(deck)]
 
 #card = deal_card(deck)
-cards_with_ace = [[:D, 'A'], [:C, 'A'], [:H, 'A'], [:S, '6']]
+cards_with_ace = [[:D, 'A'], [:C, 'A'], [:H, 'A'], [:S, '9']]
 
 #display_card(card)
 
-#display_cards_one(cards)
+display_cards_one(cards)
 
 # display_cards_two(cards)
 
 # display_cards_three(cards)
 
-puts display_value(cards_with_ace)
+#puts display_value(cards_with_ace)
+dealer_cards = [deal_card(deck), deal_card(deck)]
+player_cards = [deal_card(deck), deal_card(deck)]
+
+dealer_value = calculate_value(dealer_cards)
+player_value = calculate_value(player_cards)
+
+hands = { dealer: { cards: dealer_cards, value: dealer_value }, player: { cards: player_cards, value: player_value } }
+
+#p hands.dig(:dealer, :cards)
