@@ -173,3 +173,5 @@ player_value = calculate_value(player_cards)
 hands = { dealer: { cards: dealer_cards, value: dealer_value }, player: { cards: player_cards, value: player_value } }
 
 #p hands.dig(:dealer, :cards)
+
+─

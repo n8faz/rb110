@@ -42,7 +42,7 @@ def play?
 end
 
 def play_again?
-  prompt "Play again?"
+  prompt MESSAGES['play_again?']
   answer = answer()
   true if answer == 'yes'
 end
@@ -116,7 +116,6 @@ end
 def display_rules
   clear_screen
   puts MESSAGES['rules']
-  prompt "Press Enter to continue"
   gets.chomp
 end
 
@@ -134,13 +133,13 @@ def display_cards_one(cards)
     values << card[1]
   end
 
-  puts blank_space + ("┌───────┐     " * size)
-  puts blank_space + ("|%s     |     " * size % values)
-  puts blank_space + ("|       |     " * size)
-  puts blank_space + ("|   %s   |     " * size % suits)
-  puts blank_space + ("|       |     " * size)
-  puts blank_space + ("|     %s|     " * size % values)
-  puts blank_space + ("└───────┘     " * size)
+  puts MESSAGES['blank_space'] + ("┌───────┐     " * size)
+  puts MESSAGES['blank_space'] + ("|%s     |     " * size % values)
+  puts MESSAGES['blank_space'] + ("|       |     " * size)
+  puts MESSAGES['blank_space'] + ("|   %s   |     " * size % suits)
+  puts MESSAGES['blank_space'] + ("|       |     " * size)
+  puts MESSAGES['blank_space'] + ("|     %s|     " * size % values)
+  puts MESSAGES['blank_space'] + ("└───────┘     " * size)
 end
 
 def display_all_cards(hands, hide)
@@ -160,7 +159,7 @@ def display_dealer_hand(dealer_cards, dealer_value, hide)
   if hide
     display_cards_one(hide_card(dealer_cards))
     puts
-    prompt "Dealer Value: #{dealer_cards[0][1]}"
+    prompt "Dealer Value: #{dealer_card_value(dealer_cards[0][1])}"
   else
     display_cards_one(dealer_cards)
     puts
@@ -252,6 +251,16 @@ def calculate_value(cards)
   sum
 end
 
+def dealer_card_value(value)
+  if value.to_i == "A "
+    "1 (or 11)"
+  elsif value.to_i == 0
+    "10"
+  else
+    value
+  end
+end
+
 def number_of_aces(values)
   values.select { |value| value == 'A ' }.count
 end
@@ -277,19 +286,19 @@ def player_turn(deck, hands, score)
     player_move = hit_or_stay?
     #binding.pry
     if player_move == "stay"
-      prompt "You stay."
+      prompt MESSAGES['you_stay']
       break
     end
     hands[:player][:cards] << deal_card(deck) if player_move == "hit"
-    player_value = calculate_value(hands.dig(:player, :cards))
-    prompt "Dealing card..."
+    hands[:player][:value] = calculate_value(hands[:player][:cards])
+    prompt MESSAGES['dealing_card']
     sleep 3
-    break if busted?(player_value)
+    break if busted?(hands[:player][:value])
   end
 end
 
 def dealer_turn(deck, hands, score)
-  prompt "Revealing Dealer's Card..."
+  prompt MESSAGES['revealing']
   sleep 3
   display_board(score, hands, false)
   loop do
@@ -297,12 +306,14 @@ def dealer_turn(deck, hands, score)
     break if busted?(hands.dig(:dealer, :value))
     if dealer_stay?(hands.dig(:dealer, :value))
       display_board(score, hands, false)
-      prompt "Dealer stays. Their value is #{hands.dig(:dealer, :value)}"
+      puts
+      prompt "#{MESSAGES['dealer_stays']} #{hands.dig(:dealer, :value)}"
       sleep 3
       break
     else
       display_board(score, hands, false)
-      prompt "The dealer has to take a card..."
+      puts
+      prompt MESSAGES['dealer_hits']
       sleep 3
       hands[:dealer][:cards] << deal_card(deck)
       display_board(score, hands, false)
@@ -310,8 +321,8 @@ def dealer_turn(deck, hands, score)
   end
 end
 
-def keep_score(player, dealer, score)
-  result = detect_result(player, dealer)
+def keep_score(hands, score)
+  result = detect_result(hands[:player][:value], hands[:dealer][:value])
 
   if result == :player || result == :dealer_busted
     score[:player] += 1
@@ -338,33 +349,34 @@ loop do
       display_score(score)
 
       deck = initialize_deck
-      #binding.pry
-      dealer_cards = [deal_card(deck), deal_card(deck)]
-      player_cards = [deal_card(deck), deal_card(deck)]
-      #binding.pry
-      dealer_value = calculate_value(dealer_cards)
-      player_value = calculate_value(player_cards)
+      hands = {
+        dealer: { cards: [deal_card(deck), deal_card(deck)] },
+        player: { cards: [deal_card(deck), deal_card(deck)] }
+        }
 
-      hands = { dealer: { cards: dealer_cards, value: dealer_value }, player: { cards: player_cards, value: player_value } }
+      hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
+      hands[:player][:value] = calculate_value(hands[:player][:cards])
 
       puts
       player_turn(deck, hands, score)
-      player_value = calculate_value(player_cards)
-      puts
-      dealer_turn(deck, hands, score) unless busted?(player_value)
 
-      dealer_value = calculate_value(dealer_cards)
-      player_value = calculate_value(player_cards)
+      hands[:player][:value] = calculate_value(hands[:player][:cards])
+      puts
+
+      dealer_turn(deck, hands, score) unless busted?(hands[:player][:value])
+
+      hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
+      hands[:player][:value] = calculate_value(hands[:player][:cards])
 
       display_board(score, hands, false)
       puts
-      display_result(player_value, dealer_value)
+      display_result(hands[:player][:value], hands[:dealer][:value])
       puts
-      score = keep_score(player_value, dealer_value, score)
+      score = keep_score(hands, score)
       display_score(score)
       puts
       break if game_over?(score) || next_round? == 'no'
-      prompt "Shuffling Cards..."
+      prompt MESSAGES['shuffling']
       sleep 3
     end
   end
@@ -372,4 +384,4 @@ loop do
   break unless play_again?
 end
 
-prompt "Thanks for playing! Goodbye!"
+prompt MESSAGES['thanks']
