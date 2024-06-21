@@ -6,7 +6,7 @@ MESSAGES = YAML.load_file('twenty_one_messages.yml')
 SYMBOLS = { H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660", X: 'X' }
 CARD_SUITS = [:H, :D, :C, :S]
 CARD_VALUES =
-  ['A ', '2 ', '3 ', '4 ', '5 ', '6 ', '7 ', '8 ', '9 ', '10', 'J ', 'Q ', 'K ']
+  ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 
 SCORE = 21
 DEALER_STAY_AT = 17
@@ -111,7 +111,7 @@ def deal_card(deck)
 end
 
 def hide_card(cards)
-  [cards[0], [:X, 'X ']]
+  [cards[0], [:X, 'X']]
 end
 
 def display_intro
@@ -131,19 +131,21 @@ end
 def display_card_art(cards)
   size = cards.size
   suits = []
-  values = []
+  values_top = []
+  values_bottom = []
 
   cards.each do |card|
     suits << SYMBOLS[card[0]]
-    values << card[1]
+    values_top << (card[1].ljust(2))
+    values_bottom << (card[1].rjust(2))
   end
 
   puts MESSAGES['blank_space'] + ("┌───────┐     " * size)
-  puts MESSAGES['blank_space'] + ("|%s     |     " * size % values)
+  puts MESSAGES['blank_space'] + ("|%s     |     " * size % values_top)
   puts MESSAGES['blank_space'] + ("|       |     " * size)
   puts MESSAGES['blank_space'] + ("|   %s   |     " * size % suits)
   puts MESSAGES['blank_space'] + ("|       |     " * size)
-  puts MESSAGES['blank_space'] + ("|     %s|     " * size % values)
+  puts MESSAGES['blank_space'] + ("|     %s|     " * size % values_bottom)
   puts MESSAGES['blank_space'] + ("└───────┘     " * size)
 end
 # rubocop:enable Metrics/AbcSize
