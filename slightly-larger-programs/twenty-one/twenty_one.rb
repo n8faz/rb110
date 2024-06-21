@@ -72,6 +72,10 @@ def dealer_stay?(total)
   total >= DEALER_STAY_AT
 end
 
+def reach_score?(total)
+  total == SCORE
+end
+
 def hit_or_stay?
   answer = nil
   loop do
@@ -290,6 +294,11 @@ end
 def player_turn(deck, hands, score)
   loop do
     display_board(score, hands, true)
+    if reach_score?(hands[:player][:value])
+      prompt "You hit #{SCORE}! Nice!"
+      puts
+      break
+    end
     player_move = hit_or_stay?
     if player_move == "stay"
       prompt MESSAGES['you_stay']
@@ -374,11 +383,9 @@ loop do
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
 
-      puts
       player_turn(deck, hands, score)
 
       hands[:player][:value] = calculate_value(hands[:player][:cards])
-      puts
 
       dealer_turn(deck, hands, score) unless busted?(hands[:player][:value])
 
@@ -386,7 +393,6 @@ loop do
       hands[:player][:value] = calculate_value(hands[:player][:cards])
 
       display_board(score, hands, false)
-      puts
       display_result(hands[:player][:value], hands[:dealer][:value])
       puts
       score = keep_score(hands, score)
