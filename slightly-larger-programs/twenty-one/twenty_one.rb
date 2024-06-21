@@ -194,14 +194,20 @@ def display_result(player, dealer)
   end
 end
 
-def display_board(score, hands, hide)
+def display_board(round, score, hands, hide)
   clear_screen
+  display_round(round)
   puts
   display_score(score)
+  puts
   display_dealer_info(hands, hide)
   display_player_info(hands)
   puts MESSAGES['line']
   puts
+end
+
+def display_round(round)
+  puts "********************* ROUND #{round} ********************"
 end
 
 def display_score(score)
@@ -298,9 +304,9 @@ def detect_result(player_value, dealer_value)
 end
 
 # rubocop:disable Metrics/AbcSize
-def player_turn(deck, hands, score)
+def player_turn(deck, hands, round, score)
   loop do
-    display_board(score, hands, true)
+    display_board(round, score, hands, true)
     if reach_score?(hands[:player][:value])
       prompt "You hit #{SCORE}! Nice!"
       break
@@ -317,12 +323,12 @@ def player_turn(deck, hands, score)
 end
 # rubocop:enable Metrics/AbcSize
 
-def dealer_turn(deck, hands, score)
+def dealer_turn(deck, hands, round, score)
   dealer_reveals
   loop do
     hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
     break if busted?(hands[:dealer][:value])
-    display_board(score, hands, false)
+    display_board(round, score, hands, false)
     if dealer_stay?(hands[:dealer][:value])
       dealer_stays(hands)
       break
@@ -367,6 +373,30 @@ def keep_score(hands, score)
   score
 end
 
+def display_shuffling
+  prompt MESSAGES['shuffling']
+  sleep 3
+end
+
+def display_winner(score)
+  if score[:player] == POINTS_TO_WIN
+    prompt MESSAGES['player_winner']
+    puts
+  elsif score[:dealer] == POINTS_TO_WIN
+    prompt MESSAGES['dealer_winner']
+    puts
+  end
+end
+
+def end_of_round(current_round, score, hands)
+  display_board(current_round, score, hands, false)
+  display_result(hands[:player][:value], hands[:dealer][:value])
+  puts
+  display_score(score)
+  puts
+  display_winner(score)
+end
+
 # Program Start
 
 loop do
@@ -385,22 +415,18 @@ loop do
         dealer: { cards: [deal_card(deck), deal_card(deck)] },
         player: { cards: [deal_card(deck), deal_card(deck)] }
       }
-      
+
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
 
-      player_turn(deck, hands, score)
-      dealer_turn(deck, hands, score) unless busted?(hands[:player][:value])
-
-      display_board(score, hands, false)
-      display_result(hands[:player][:value], hands[:dealer][:value])
-      puts
+      player_turn(deck, hands, current_round, score)
+      dealer_turn(deck, hands, current_round, score) unless busted?(hands[:player][:value])
+  
       score = keep_score(hands, score)
-      display_score(score)
-      puts
+      end_of_round(current_round, score, hands)
+
       break if game_over?(score) || next_round? == 'no'
-      prompt MESSAGES['shuffling']
-      sleep 3
+      display_shuffling
     end
   end
 

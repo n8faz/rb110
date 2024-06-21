@@ -47,7 +47,7 @@ rules: "****************** RULES ******************
 \n - When there is a push no one wins the hand
 \n
 \n => Press Enter to continue "
-line: "-------------------------------------------------"
+line: "--------------------------------------------------"
 play_again?: "Would you like to play again?"
 blank_space: "   "
 you_stay: "You stay."
@@ -57,3 +57,5 @@ revealing: "Revealing Dealer's Card..."
 dealer_hits: "The dealer has to take a card..."
 shuffling: "Shuffling Cards..."
 thanks: "Thanks for playing! Goodbye!"
+player_winner: "You're the winner! Congratulations!"
+dealer_winner: "Dealer is the winner."
