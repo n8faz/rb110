@@ -392,13 +392,7 @@ loop do
       hands[:player][:value] = calculate_value(hands[:player][:cards])
 
       player_turn(deck, hands, score)
-
-      hands[:player][:value] = calculate_value(hands[:player][:cards])
-
       dealer_turn(deck, hands, score) unless busted?(hands[:player][:value])
-
-      hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
-      hands[:player][:value] = calculate_value(hands[:player][:cards])
 
       display_board(score, hands, false)
       display_result(hands[:player][:value], hands[:dealer][:value])
