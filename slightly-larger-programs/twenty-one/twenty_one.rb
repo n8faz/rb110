@@ -376,18 +376,16 @@ loop do
   play = play?
   if play == 'yes'
     score = { player: 0, dealer: 0 }
+    current_round = 0
 
     loop do
-      clear_screen
-
-      display_score(score)
-
+      current_round += 1
       deck = initialize_deck
       hands = {
         dealer: { cards: [deal_card(deck), deal_card(deck)] },
         player: { cards: [deal_card(deck), deal_card(deck)] }
       }
-
+      
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
 
