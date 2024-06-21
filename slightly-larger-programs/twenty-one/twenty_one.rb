@@ -219,9 +219,9 @@ def display_value(cards)
   values = cards.map { |card| card[1] }
   sum = 0
 
-  if values.include?('A ')
+  if values.include?('A')
     values.each do |value|
-      sum += if value == 'A '
+      sum += if value == 'A'
                next
              elsif value.to_i == 0
                10
@@ -249,7 +249,7 @@ def calculate_value(cards)
 
   sum = 0
   values.each do |value|
-    sum += if value == "A "
+    sum += if value == "A"
              11
            elsif value.to_i == 0
              10
@@ -266,7 +266,7 @@ def calculate_value(cards)
 end
 
 def dealer_card_value(value)
-  if value == "A "
+  if value == "A"
     "1 (or 11)"
   elsif value.to_i == 0
     "10"
@@ -276,7 +276,7 @@ def dealer_card_value(value)
 end
 
 def number_of_aces(values)
-  values.select { |value| value == 'A ' }.count
+  values.select { |value| value == 'A' }.count
 end
 
 def detect_result(player_value, dealer_value)
