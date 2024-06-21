@@ -129,7 +129,6 @@ end
 
 # rubocop:disable Metrics/AbcSize
 def display_card_art(cards)
-  size = cards.size
   suits = []
   values_top = []
   values_bottom = []
@@ -140,13 +139,13 @@ def display_card_art(cards)
     values_bottom << (card[1].rjust(2))
   end
 
-  puts MESSAGES['blank_space'] + ("┌───────┐     " * size)
-  puts MESSAGES['blank_space'] + ("|%s     |     " * size % values_top)
-  puts MESSAGES['blank_space'] + ("|       |     " * size)
-  puts MESSAGES['blank_space'] + ("|   %s   |     " * size % suits)
-  puts MESSAGES['blank_space'] + ("|       |     " * size)
-  puts MESSAGES['blank_space'] + ("|     %s|     " * size % values_bottom)
-  puts MESSAGES['blank_space'] + ("└───────┘     " * size)
+  puts MESSAGES['blank_space'] + ("┌───────┐     " * cards.size)
+  puts MESSAGES['blank_space'] + ("|%s     |     " * cards.size % values_top)
+  puts MESSAGES['blank_space'] + ("|       |     " * cards.size)
+  puts MESSAGES['blank_space'] + ("|   %s   |     " * cards.size % suits)
+  puts MESSAGES['blank_space'] + ("|       |     " * cards.size)
+  puts MESSAGES['blank_space'] + ("|     %s|     " * cards.size % values_bottom)
+  puts MESSAGES['blank_space'] + ("└───────┘     " * cards.size)
 end
 # rubocop:enable Metrics/AbcSize
 
@@ -220,15 +219,7 @@ def display_value(cards)
   sum = 0
 
   if values.include?('A')
-    values.each do |value|
-      sum += if value == 'A'
-               next
-             elsif value.to_i == 0
-               10
-             else
-               value.to_i
-             end
-    end
+    sum = skip_aces(values, sum)
 
     (number_of_aces(values) - 1).times { sum += 1 }
 
@@ -240,6 +231,19 @@ def display_value(cards)
     end
   else
     sum = calculate_value(cards)
+  end
+  sum
+end
+
+def skip_aces(values, sum)
+  values.each do |value|
+    sum += if value == 'A'
+             next
+           elsif value.to_i == 0
+             10
+           else
+             value.to_i
+           end
   end
   sum
 end
@@ -293,12 +297,12 @@ def detect_result(player_value, dealer_value)
   end
 end
 
+# rubocop:disable Metrics/AbcSize
 def player_turn(deck, hands, score)
   loop do
     display_board(score, hands, true)
     if reach_score?(hands[:player][:value])
       prompt "You hit #{SCORE}! Nice!"
-      puts
       break
     end
     player_move = hit_or_stay?
@@ -311,6 +315,7 @@ def player_turn(deck, hands, score)
     break if busted?(hands[:player][:value])
   end
 end
+# rubocop:enable Metrics/AbcSize
 
 def dealer_turn(deck, hands, score)
   dealer_reveals
@@ -334,6 +339,7 @@ def player_hits(deck, hands)
 end
 
 def dealer_reveals
+  puts
   prompt MESSAGES['revealing']
   sleep 3
 end
