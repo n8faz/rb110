@@ -114,6 +114,7 @@ def display_intro
   prompt "Let's play 21!"
   display_rules if read_rules? == 'yes'
   prompt MESSAGES['points'] + "#{POINTS_TO_WIN} points is the winner!"
+  puts
 end
 
 def display_rules
@@ -190,10 +191,12 @@ end
 
 def display_board(score, hands, hide)
   clear_screen
+  puts
   display_score(score)
   display_dealer_info(hands, hide)
   display_player_info(hands)
   puts MESSAGES['line']
+  puts
 end
 
 def display_score(score)
@@ -287,28 +290,23 @@ end
 def player_turn(deck, hands, score)
   loop do
     display_board(score, hands, true)
-    puts
     player_move = hit_or_stay?
     if player_move == "stay"
       prompt MESSAGES['you_stay']
       break
     end
-    hands[:player][:cards] << deal_card(deck) if player_move == "hit"
+    player_hits(deck, hands) if player_move == "hit"
     hands[:player][:value] = calculate_value(hands[:player][:cards])
-    prompt MESSAGES['dealing_card']
-    sleep 3
     break if busted?(hands[:player][:value])
   end
 end
 
 def dealer_turn(deck, hands, score)
-  prompt MESSAGES['revealing']
-  sleep 3
+  dealer_reveals
   loop do
     hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
     break if busted?(hands[:dealer][:value])
     display_board(score, hands, false)
-    puts
     if dealer_stay?(hands[:dealer][:value])
       dealer_stays(hands)
       break
@@ -316,6 +314,17 @@ def dealer_turn(deck, hands, score)
       dealer_hits(deck, hands)
     end
   end
+end
+
+def player_hits(deck, hands)
+  hands[:player][:cards] << deal_card(deck)
+  prompt MESSAGES['dealing_card']
+  sleep 3
+end
+
+def dealer_reveals
+  prompt MESSAGES['revealing']
+  sleep 3
 end
 
 def dealer_stays(hands)
@@ -346,7 +355,7 @@ end
 loop do
   clear_screen
   display_intro
-  puts
+
   play = play?
   if play == 'yes'
     score = { player: 0, dealer: 0 }
