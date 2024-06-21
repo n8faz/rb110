@@ -2,12 +2,15 @@ require "pry"
 require "yaml"
 
 MESSAGES = YAML.load_file('twenty_one_messages.yml')
+
+SYMBOLS = { H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660", X: 'X' }
+CARD_SUITS = [:H, :D, :C, :S]
+CARD_VALUES =
+  ['A ', '2 ', '3 ', '4 ', '5 ', '6 ', '7 ', '8 ', '9 ', '10', 'J ', 'Q ', 'K ']
+
 SCORE = 21
 DEALER_STAY_AT = 17
 POINTS_TO_WIN = 5
-SYMBOLS = { H: "\u2665", D: "\u2666", C: "\u2663", S: "\u2660", X: 'X' }
-CARD_SUITS =[:H, :D, :C, :S]
-CARD_VALUES = ['A ', '2 ', '3 ', '4 ', '5 ', '6 ', '7 ', '8 ', '9 ', '10', 'J ', 'Q ', 'K ']
 
 def clear_screen
   system "clear"
@@ -119,7 +122,8 @@ def display_rules
   gets.chomp
 end
 
-def display_cards_one(cards)
+# rubocop:disable Metrics/AbcSize
+def display_card_art(cards)
   size = cards.size
   suits = []
   values = []
@@ -137,27 +141,31 @@ def display_cards_one(cards)
   puts MESSAGES['blank_space'] + ("|     %s|     " * size % values)
   puts MESSAGES['blank_space'] + ("└───────┘     " * size)
 end
+# rubocop:enable Metrics/AbcSize
 
-def display_all_cards(hands, hide)
+def display_dealer_info(hands, hide)
   puts MESSAGES['dealer_cards']
   puts
-  display_dealer_hand(hands.dig(:dealer, :cards), hands.dig(:dealer, :value), hide)
+  display_dealer_hand(hands[:dealer][:cards], hands[:dealer][:value], hide)
   puts
+end
+
+def display_player_info(hands)
   puts MESSAGES['player_cards']
   puts
-  display_cards_one(hands.dig(:player, :cards))
+  display_card_art(hands[:player][:cards])
   puts
-  prompt "Player Value: #{display_value(hands.dig(:player, :cards))}"
+  prompt "Player Value: #{display_value(hands[:player][:cards])}"
   puts
 end
 
 def display_dealer_hand(dealer_cards, dealer_value, hide)
   if hide
-    display_cards_one(hide_card(dealer_cards))
+    display_card_art(hide_card(dealer_cards))
     puts
     prompt "Dealer Value: #{dealer_card_value(dealer_cards[0][1])}"
   else
-    display_cards_one(dealer_cards)
+    display_card_art(dealer_cards)
     puts
     prompt "Dealer Value: #{dealer_value}"
   end
@@ -183,7 +191,8 @@ end
 def display_board(score, hands, hide)
   clear_screen
   display_score(score)
-  display_all_cards(hands, hide)
+  display_dealer_info(hands, hide)
+  display_player_info(hands)
   puts MESSAGES['line']
 end
 
@@ -248,7 +257,7 @@ def calculate_value(cards)
 end
 
 def dealer_card_value(value)
-  if value.to_i == "A "
+  if value == "A "
     "1 (or 11)"
   elsif value.to_i == 0
     "10"
@@ -280,7 +289,6 @@ def player_turn(deck, hands, score)
     display_board(score, hands, true)
     puts
     player_move = hit_or_stay?
-    #binding.pry
     if player_move == "stay"
       prompt MESSAGES['you_stay']
       break
@@ -296,25 +304,29 @@ end
 def dealer_turn(deck, hands, score)
   prompt MESSAGES['revealing']
   sleep 3
-  display_board(score, hands, false)
   loop do
-    hands[:dealer][:value] = calculate_value(hands.dig(:dealer, :cards))
-    break if busted?(hands.dig(:dealer, :value))
-    if dealer_stay?(hands.dig(:dealer, :value))
-      display_board(score, hands, false)
-      puts
-      prompt "#{MESSAGES['dealer_stays']} #{hands.dig(:dealer, :value)}"
-      sleep 3
+    hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
+    break if busted?(hands[:dealer][:value])
+    display_board(score, hands, false)
+    puts
+    if dealer_stay?(hands[:dealer][:value])
+      dealer_stays(hands)
       break
     else
-      display_board(score, hands, false)
-      puts
-      prompt MESSAGES['dealer_hits']
-      sleep 3
-      hands[:dealer][:cards] << deal_card(deck)
-      display_board(score, hands, false)
+      dealer_hits(deck, hands)
     end
   end
+end
+
+def dealer_stays(hands)
+  prompt "#{MESSAGES['dealer_stays']} #{hands[:dealer][:value]}"
+  sleep 3
+end
+
+def dealer_hits(deck, hands)
+  prompt MESSAGES['dealer_hits']
+  sleep 3
+  hands[:dealer][:cards] << deal_card(deck)
 end
 
 def keep_score(hands, score)
@@ -348,7 +360,7 @@ loop do
       hands = {
         dealer: { cards: [deal_card(deck), deal_card(deck)] },
         player: { cards: [deal_card(deck), deal_card(deck)] }
-        }
+      }
 
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
