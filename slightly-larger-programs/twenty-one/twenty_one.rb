@@ -221,6 +221,7 @@ def keep_score(hands, score)
 end
 
 def display_intro
+  clear_screen
   prompt "Let's play 21!"
   display_rules if read_rules? == 'yes'
   prompt MESSAGES['points'] + "#{POINTS_TO_WIN} points is the winner!"
@@ -370,6 +371,14 @@ def display_value(cards)
   sum
 end
 
+def display_exit_message(play)
+  if play == 'no'
+    prompt MESSAGES['didnt_play']
+  else
+    prompt MESSAGES['thanks']
+  end
+end
+
 # rubocop:disable Metrics/AbcSize
 def player_turn(deck, hands, round, score)
   loop do
@@ -417,16 +426,15 @@ end
 
 # Program Start
 
-loop do
-  clear_screen
-  display_intro
+display_intro
 
-  play = play?
-  if play == 'yes'
+play = play?
+if play == 'yes'
+  loop do
     score = { player: 0, dealer: 0 }
     round = 0
-
     loop do
+      display_shuffling
       round += 1
       deck = initialize_deck
       hands = {
@@ -435,20 +443,16 @@ loop do
       }
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
-
       player_turn(deck, hands, round, score)
       unless busted?(hands[:player][:value])
         dealer_turn(deck, hands, round, score)
       end
       score = keep_score(hands, score)
       end_of_round(round, score, hands)
-
       break if game_over?(score) || next_round? == 'no'
-      display_shuffling
     end
+    break unless play_again?
   end
-
-  break unless play_again?
 end
 
-prompt MESSAGES['thanks']
+display_exit_message(play)
