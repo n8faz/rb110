@@ -240,8 +240,6 @@ def display_intro
   clear_screen
   prompt "Let's play 21!"
   display_rules if read_rules? == 'yes'
-  #prompt MESSAGES['points'] + "#{POINTS_TO_WIN} points is the winner!"
-  #puts
 end
 
 def display_rules
@@ -395,6 +393,7 @@ def display_exit_message(play)
 end
 
 # rubocop:disable Metrics/AbcSize
+# rubocop:disable Metrics/MethodLength
 def player_turn(deck, hands, round, score, points)
   loop do
     display_round(round, score, points)
@@ -413,7 +412,7 @@ def player_turn(deck, hands, round, score, points)
     break if busted?(hands[:player][:value])
   end
 end
-# rubocop:enable Metrics/AbcSize
+# rubocop:enable Metrics/MethodLength
 
 def dealer_turn(deck, hands, round, score, points)
   display_round(round, score, points)
@@ -432,6 +431,7 @@ def dealer_turn(deck, hands, round, score, points)
     end
   end
 end
+# rubocop:enable Metrics/AbcSize
 
 def end_of_round(round, score, points, hands)
   display_round(round, score, points)
