@@ -50,7 +50,7 @@ rules: "****************** RULES ******************
 line: "--------------------------------------------------"
 play_again?: "Would you like to play again?"
 blank_space: "   "
-you_stay: "You stay."
+you_stay: "You stay. Your value is"
 dealer_stays: "Dealer stays. Their value is"
 dealing_card: "Dealing card..."
 revealing: "Revealing Dealer's Card..."

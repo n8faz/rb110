@@ -121,13 +121,17 @@ def player_hits(deck, hands)
 end
 
 def dealer_reveals
-  puts
   prompt MESSAGES['revealing']
   sleep 3
 end
 
 def dealer_stays(hands)
   prompt "#{MESSAGES['dealer_stays']} #{hands[:dealer][:value]}"
+  sleep 3
+end
+
+def player_stays(hands)
+  prompt "#{MESSAGES['you_stay']} #{hands[:player][:value]}"
   sleep 3
 end
 
@@ -253,12 +257,16 @@ def display_dealer_info(hands, hide)
   puts
 end
 
-def display_player_info(hands)
+def display_player_info(hands, stay)
   puts MESSAGES['player_cards']
   puts
   display_card_art(hands[:player][:cards])
   puts
-  prompt "Player Value: #{display_value(hands[:player][:cards])}"
+  if stay
+    prompt "Player Value: #{calculate_value(hands[:player][:cards])}"
+  else
+    prompt "Player Value: #{display_value(hands[:player][:cards])}"
+  end
   puts
 end
 
@@ -291,14 +299,14 @@ def display_result(player, dealer)
   end
 end
 
-def display_board(round, score, hands, hide)
+def display_board(round, score, hands, hide, stay)
   clear_screen
   display_round(round)
   puts
   display_score(score)
   puts
   display_dealer_info(hands, hide)
-  display_player_info(hands)
+  display_player_info(hands, stay)
   puts MESSAGES['line']
   puts
 end
@@ -356,14 +364,14 @@ end
 # rubocop:disable Metrics/AbcSize
 def player_turn(deck, hands, round, score)
   loop do
-    display_board(round, score, hands, true)
+    display_board(round, score, hands, true, false)
     if reach_score?(hands[:player][:value])
       prompt "You hit #{SCORE}! Nice!"
       break
     end
     player_move = hit_or_stay?
     if player_move == "stay"
-      prompt MESSAGES['you_stay']
+      player_stays(hands)
       break
     end
     player_hits(deck, hands) if player_move == "hit"
@@ -374,11 +382,12 @@ end
 # rubocop:enable Metrics/AbcSize
 
 def dealer_turn(deck, hands, round, score)
+  display_board(round, score, hands, false, true)
   dealer_reveals
   loop do
     hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
     break if busted?(hands[:dealer][:value])
-    display_board(round, score, hands, false)
+    display_board(round, score, hands, false, true)
     if dealer_stay?(hands[:dealer][:value])
       dealer_stays(hands)
       break
@@ -389,7 +398,7 @@ def dealer_turn(deck, hands, round, score)
 end
 
 def end_of_round(current_round, score, hands)
-  display_board(current_round, score, hands, false)
+  display_board(current_round, score, hands, false, true)
   display_result(hands[:player][:value], hands[:dealer][:value])
   puts
   display_winner(score)
@@ -413,7 +422,7 @@ loop do
       deck = initialize_deck
       hands = {
         dealer: { cards: [deal_card(deck), deal_card(deck)] },
-        player: { cards: [deal_card(deck), deal_card(deck)] }
+        player: { cards: [deal_card(deck), [:H,'A']] }
       }
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
