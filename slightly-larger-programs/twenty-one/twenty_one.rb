@@ -10,7 +10,6 @@ CARD_VALUES =
 
 SCORE = 21
 DEALER_STAY_AT = 17
-POINTS_TO_WIN = 2
 
 def clear_screen
   system "clear"
@@ -98,12 +97,14 @@ end
 def how_many_points?
   points = 0
   loop do
-    prompt "How many points should it take to win?"
+    prompt MESSAGES['how_many_points']
     answer = gets.chomp
     if answer.to_i == 0
-      prompt "Please enter a valid number. Example: 3"
+      prompt MESSAGES['valid_number']
     else
       points = answer.to_i
+      prompt "Great! It will take #{points} points to win. Let's play!"
+      puts
       break
     end
   end
@@ -450,6 +451,7 @@ display_intro
 play = play?
 if play == 'yes'
   points = how_many_points?
+
   loop do
     score = { player: 0, dealer: 0 }
     round = 0
