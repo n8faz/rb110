@@ -114,9 +114,8 @@ def hide_card(cards)
   [cards[0], [:X, 'X']]
 end
 
-def player_hits(deck, hands)
-  hands[:player][:cards] << deal_card(deck)
-  prompt MESSAGES['dealing_card']
+def player_hit_score
+  prompt "You hit #{SCORE}! Nice!"
   sleep 3
 end
 
@@ -139,6 +138,12 @@ def dealer_hits(deck, hands)
   prompt MESSAGES['dealer_hits']
   sleep 3
   hands[:dealer][:cards] << deal_card(deck)
+end
+
+def player_hits(deck, hands)
+  hands[:player][:cards] << deal_card(deck)
+  prompt MESSAGES['dealing_card']
+  sleep 3
 end
 
 def skip_aces(values, sum)
@@ -250,10 +255,10 @@ def display_card_art(cards)
 end
 # rubocop:enable Metrics/AbcSize
 
-def display_dealer_info(hands, hide)
+def display_dealer_info(hands, hide, stay)
   puts MESSAGES['dealer_cards']
   puts
-  display_dealer_hand(hands[:dealer][:cards], hide)
+  display_dealer_hand(hands[:dealer][:cards], hide, stay)
   puts
 end
 
@@ -270,11 +275,15 @@ def display_player_info(hands, stay)
   puts
 end
 
-def display_dealer_hand(dealer_cards, hide)
+def display_dealer_hand(dealer_cards, hide, stay)
   if hide
     display_card_art(hide_card(dealer_cards))
     puts
     prompt "Dealer Value: #{dealer_card_value(dealer_cards[0][1])}"
+  elsif stay
+    display_card_art(dealer_cards)
+    puts
+    prompt "Dealer Value: #{calculate_value(dealer_cards)}"
   else
     display_card_art(dealer_cards)
     puts
@@ -299,14 +308,14 @@ def display_result(player, dealer)
   end
 end
 
-def display_board(round, score, hands, hide, stay)
+def display_board(round, score, hands, hide, player_stay, dealer_stay)
   clear_screen
   display_round(round)
   puts
   display_score(score)
   puts
-  display_dealer_info(hands, hide)
-  display_player_info(hands, stay)
+  display_dealer_info(hands, hide, dealer_stay)
+  display_player_info(hands, player_stay)
   puts MESSAGES['line']
   puts
 end
@@ -364,9 +373,9 @@ end
 # rubocop:disable Metrics/AbcSize
 def player_turn(deck, hands, round, score)
   loop do
-    display_board(round, score, hands, true, false)
+    display_board(round, score, hands, true, false, false)
     if reach_score?(hands[:player][:value])
-      prompt "You hit #{SCORE}! Nice!"
+      player_hit_score
       break
     end
     player_move = hit_or_stay?
@@ -382,12 +391,12 @@ end
 # rubocop:enable Metrics/AbcSize
 
 def dealer_turn(deck, hands, round, score)
-  display_board(round, score, hands, false, true)
+  display_board(round, score, hands, true, true, false)
   dealer_reveals
   loop do
     hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
     break if busted?(hands[:dealer][:value])
-    display_board(round, score, hands, false, true)
+    display_board(round, score, hands, false, true, false)
     if dealer_stay?(hands[:dealer][:value])
       dealer_stays(hands)
       break
@@ -397,8 +406,8 @@ def dealer_turn(deck, hands, round, score)
   end
 end
 
-def end_of_round(current_round, score, hands)
-  display_board(current_round, score, hands, false, true)
+def end_of_round(round, score, hands)
+  display_board(round, score, hands, false, true, true)
   display_result(hands[:player][:value], hands[:dealer][:value])
   puts
   display_winner(score)
@@ -422,7 +431,7 @@ loop do
       deck = initialize_deck
       hands = {
         dealer: { cards: [deal_card(deck), deal_card(deck)] },
-        player: { cards: [deal_card(deck), [:H,'A']] }
+        player: { cards: [deal_card(deck), deal_card(deck)] }
       }
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
