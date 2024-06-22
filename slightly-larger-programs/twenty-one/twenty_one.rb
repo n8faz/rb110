@@ -249,7 +249,7 @@ end
 def display_dealer_info(hands, hide)
   puts MESSAGES['dealer_cards']
   puts
-  display_dealer_hand(hands, hide)
+  display_dealer_hand(hands[:dealer][:cards], hide)
   puts
 end
 
@@ -262,15 +262,15 @@ def display_player_info(hands)
   puts
 end
 
-def display_dealer_hand(hands, hide)
+def display_dealer_hand(dealer_cards, hide)
   if hide
-    display_card_art(hide_card(hands[:dealer][:cards]))
+    display_card_art(hide_card(dealer_cards))
     puts
-    prompt "Dealer Value: #{dealer_card_value(hands[:dealer][:cards][0][1])}"
+    prompt "Dealer Value: #{dealer_card_value(dealer_cards[0][1])}"
   else
-    display_card_art(hands[:dealer][:cards])
+    display_card_art(dealer_cards)
     puts
-    prompt "Dealer Value: #{display_value(hands[:dealer][:cards])}"
+    prompt "Dealer Value: #{display_value(dealer_cards)}"
   end
 end
 
@@ -406,10 +406,10 @@ loop do
   play = play?
   if play == 'yes'
     score = { player: 0, dealer: 0 }
-    current_round = 0
+    round = 0
 
     loop do
-      current_round += 1
+      round += 1
       deck = initialize_deck
       hands = {
         dealer: { cards: [deal_card(deck), deal_card(deck)] },
@@ -418,11 +418,12 @@ loop do
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
 
-      player_turn(deck, hands, current_round, score)
-      dealer_turn(deck, hands, current_round, score) unless busted?(hands[:player][:value])
-
+      player_turn(deck, hands, round, score)
+      unless busted?(hands[:player][:value])
+        dealer_turn(deck, hands, round, score)
+      end
       score = keep_score(hands, score)
-      end_of_round(current_round, score, hands)
+      end_of_round(round, score, hands)
 
       break if game_over?(score) || next_round? == 'no'
       display_shuffling
