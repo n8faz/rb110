@@ -50,8 +50,8 @@ def play_again?
   true if answer == 'yes'
 end
 
-def game_over?(score)
-  score[:player] == POINTS_TO_WIN || score[:dealer] == POINTS_TO_WIN
+def game_over?(score, points)
+  score[:player] == points || score[:dealer] == points
 end
 
 def next_round?
@@ -93,6 +93,21 @@ def hit_or_stay?
     end
   end
   answer
+end
+
+def how_many_points?
+  points = 0
+  loop do
+    prompt "How many points should it take to win?"
+    answer = gets.chomp
+    if answer.to_i == 0
+      prompt "Please enter a valid number. Example: 3"
+    else
+      points = answer.to_i
+      break
+    end
+  end
+  points
 end
 
 def initialize_deck
@@ -225,8 +240,8 @@ def display_intro
   clear_screen
   prompt "Let's play 21!"
   display_rules if read_rules? == 'yes'
-  prompt MESSAGES['points'] + "#{POINTS_TO_WIN} points is the winner!"
-  puts
+  #prompt MESSAGES['points'] + "#{POINTS_TO_WIN} points is the winner!"
+  #puts
 end
 
 def display_rules
@@ -310,24 +325,23 @@ def display_result(player, dealer)
   end
 end
 
-def display_board(round, score, hands, hide, player_stay, dealer_stay)
-  clear_screen
-  display_round(round)
-  puts
-  display_score(score)
-  puts
+def display_board(hands, hide, player_stay, dealer_stay)
   display_dealer_info(hands, hide, dealer_stay)
   display_player_info(hands, player_stay)
   puts MESSAGES['line']
   puts
 end
 
-def display_round(round)
+def display_round(round, score, points)
+  clear_screen
   puts "********************* ROUND #{round} ********************"
+  puts
+  display_score(score, points)
+  puts
 end
 
-def display_score(score)
-  if game_over?(score)
+def display_score(score, points)
+  if game_over?(score, points)
     prompt MESSAGES['final_score']
   else
     prompt MESSAGES['current_score']
@@ -341,11 +355,11 @@ def display_shuffling
   sleep 3
 end
 
-def display_winner(score)
-  if score[:player] == POINTS_TO_WIN
+def display_winner(score, points)
+  if score[:player] == points
     prompt MESSAGES['player_winner']
     puts
-  elsif score[:dealer] == POINTS_TO_WIN
+  elsif score[:dealer] == points
     prompt MESSAGES['dealer_winner']
     puts
   end
@@ -381,9 +395,10 @@ def display_exit_message(play)
 end
 
 # rubocop:disable Metrics/AbcSize
-def player_turn(deck, hands, round, score)
+def player_turn(deck, hands, round, score, points)
   loop do
-    display_board(round, score, hands, true, false, false)
+    display_round(round, score, points)
+    display_board(hands, true, false, false)
     if reach_score?(hands[:player][:value])
       player_hit_score
       break
@@ -400,13 +415,15 @@ def player_turn(deck, hands, round, score)
 end
 # rubocop:enable Metrics/AbcSize
 
-def dealer_turn(deck, hands, round, score)
-  display_board(round, score, hands, true, true, false)
+def dealer_turn(deck, hands, round, score, points)
+  display_round(round, score, points)
+  display_board(hands, true, true, false)
   dealer_reveals
   loop do
     hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
     break if busted?(hands[:dealer][:value])
-    display_board(round, score, hands, false, true, false)
+    display_round(round, score, points)
+    display_board(hands, false, true, false)
     if dealer_stay?(hands[:dealer][:value])
       dealer_stays(hands)
       break
@@ -416,12 +433,13 @@ def dealer_turn(deck, hands, round, score)
   end
 end
 
-def end_of_round(round, score, hands)
-  display_board(round, score, hands, false, true, true)
+def end_of_round(round, score, points, hands)
+  display_round(round, score, points)
+  display_board(hands, false, true, true)
   display_result(hands[:player][:value], hands[:dealer][:value])
   puts
-  display_winner(score)
-  display_score(score)
+  display_winner(score, points)
+  display_score(score, points)
   puts
 end
 
@@ -431,6 +449,7 @@ display_intro
 
 play = play?
 if play == 'yes'
+  points = how_many_points?
   loop do
     score = { player: 0, dealer: 0 }
     round = 0
@@ -445,15 +464,15 @@ if play == 'yes'
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
 
-      player_turn(deck, hands, round, score)
+      player_turn(deck, hands, round, score, points)
       unless busted?(hands[:player][:value])
-        dealer_turn(deck, hands, round, score)
+        dealer_turn(deck, hands, round, score, points)
       end
 
       score = keep_score(hands, score)
-      end_of_round(round, score, hands)
+      end_of_round(round, score, points, hands)
 
-      break if game_over?(score) || !next_round?
+      break if game_over?(score, points) || next_round? == false
     end
     break unless play_again?
   end
