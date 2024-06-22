@@ -114,6 +114,103 @@ def hide_card(cards)
   [cards[0], [:X, 'X']]
 end
 
+def player_hits(deck, hands)
+  hands[:player][:cards] << deal_card(deck)
+  prompt MESSAGES['dealing_card']
+  sleep 3
+end
+
+def dealer_reveals
+  puts
+  prompt MESSAGES['revealing']
+  sleep 3
+end
+
+def dealer_stays(hands)
+  prompt "#{MESSAGES['dealer_stays']} #{hands[:dealer][:value]}"
+  sleep 3
+end
+
+def dealer_hits(deck, hands)
+  prompt MESSAGES['dealer_hits']
+  sleep 3
+  hands[:dealer][:cards] << deal_card(deck)
+end
+
+def skip_aces(values, sum)
+  values.each do |value|
+    sum += if value == 'A'
+             next
+           elsif value.to_i == 0
+             10
+           else
+             value.to_i
+           end
+  end
+  sum
+end
+
+def number_of_aces(values)
+  values.select { |value| value == 'A' }.count
+end
+
+def calculate_value(cards)
+  values = cards.map { |card| card[1] }
+
+  sum = 0
+  values.each do |value|
+    sum += if value == "A"
+             11
+           elsif value.to_i == 0
+             10
+           else
+             value.to_i
+           end
+  end
+
+  number_of_aces(values).times do
+    sum -= 10 if sum > SCORE
+  end
+
+  sum
+end
+
+def dealer_card_value(value)
+  if value == "A"
+    "1 (or 11)"
+  elsif value.to_i == 0
+    "10"
+  else
+    value
+  end
+end
+
+def detect_result(player_value, dealer_value)
+  if player_value > SCORE
+    :player_busted
+  elsif dealer_value > SCORE
+    :dealer_busted
+  elsif dealer_value < player_value
+    :player
+  elsif dealer_value > player_value
+    :dealer
+  else
+    :push
+  end
+end
+
+def keep_score(hands, score)
+  result = detect_result(hands[:player][:value], hands[:dealer][:value])
+
+  if result == :player || result == :dealer_busted
+    score[:player] += 1
+  elsif result == :dealer || result == :player_busted
+    score[:dealer] += 1
+  end
+
+  score
+end
+
 def display_intro
   prompt "Let's play 21!"
   display_rules if read_rules? == 'yes'
@@ -152,7 +249,7 @@ end
 def display_dealer_info(hands, hide)
   puts MESSAGES['dealer_cards']
   puts
-  display_dealer_hand(hands[:dealer][:cards], hands[:dealer][:value], hide)
+  display_dealer_hand(hands, hide)
   puts
 end
 
@@ -165,15 +262,15 @@ def display_player_info(hands)
   puts
 end
 
-def display_dealer_hand(dealer_cards, dealer_value, hide)
+def display_dealer_hand(hands, hide)
   if hide
-    display_card_art(hide_card(dealer_cards))
+    display_card_art(hide_card(hands[:dealer][:cards]))
     puts
-    prompt "Dealer Value: #{dealer_card_value(dealer_cards[0][1])}"
+    prompt "Dealer Value: #{dealer_card_value(hands[:dealer][:cards][0][1])}"
   else
-    display_card_art(dealer_cards)
+    display_card_art(hands[:dealer][:cards])
     puts
-    prompt "Dealer Value: #{dealer_value}"
+    prompt "Dealer Value: #{display_value(hands[:dealer][:cards])}"
   end
 end
 
@@ -220,6 +317,21 @@ def display_score(score)
   prompt "Dealer: #{score[:dealer]}"
 end
 
+def display_shuffling
+  prompt MESSAGES['shuffling']
+  sleep 3
+end
+
+def display_winner(score)
+  if score[:player] == POINTS_TO_WIN
+    prompt MESSAGES['player_winner']
+    puts
+  elsif score[:dealer] == POINTS_TO_WIN
+    prompt MESSAGES['dealer_winner']
+    puts
+  end
+end
+
 def display_value(cards)
   values = cards.map { |card| card[1] }
   sum = 0
@@ -239,68 +351,6 @@ def display_value(cards)
     sum = calculate_value(cards)
   end
   sum
-end
-
-def skip_aces(values, sum)
-  values.each do |value|
-    sum += if value == 'A'
-             next
-           elsif value.to_i == 0
-             10
-           else
-             value.to_i
-           end
-  end
-  sum
-end
-
-def calculate_value(cards)
-  values = cards.map { |card| card[1] }
-
-  sum = 0
-  values.each do |value|
-    sum += if value == "A"
-             11
-           elsif value.to_i == 0
-             10
-           else
-             value.to_i
-           end
-  end
-
-  number_of_aces(values).times do
-    sum -= 10 if sum > SCORE
-  end
-
-  sum
-end
-
-def dealer_card_value(value)
-  if value == "A"
-    "1 (or 11)"
-  elsif value.to_i == 0
-    "10"
-  else
-    value
-  end
-end
-
-def number_of_aces(values)
-  values.select { |value| value == 'A' }.count
-end
-
-def detect_result(player_value, dealer_value)
-  if player_value > SCORE
-    :player_busted
-  elsif dealer_value > SCORE
-    :dealer_busted
-  elsif dealer_value < player_value
-    :player
-  elsif dealer_value > player_value
-    :dealer
-  else
-    :push
-  end
 end
 
 # rubocop:disable Metrics/AbcSize
@@ -338,56 +388,6 @@ def dealer_turn(deck, hands, round, score)
   end
 end
 
-def player_hits(deck, hands)
-  hands[:player][:cards] << deal_card(deck)
-  prompt MESSAGES['dealing_card']
-  sleep 3
-end
-
-def dealer_reveals
-  puts
-  prompt MESSAGES['revealing']
-  sleep 3
-end
-
-def dealer_stays(hands)
-  prompt "#{MESSAGES['dealer_stays']} #{hands[:dealer][:value]}"
-  sleep 3
-end
-
-def dealer_hits(deck, hands)
-  prompt MESSAGES['dealer_hits']
-  sleep 3
-  hands[:dealer][:cards] << deal_card(deck)
-end
-
-def keep_score(hands, score)
-  result = detect_result(hands[:player][:value], hands[:dealer][:value])
-
-  if result == :player || result == :dealer_busted
-    score[:player] += 1
-  elsif result == :dealer || result == :player_busted
-    score[:dealer] += 1
-  end
-
-  score
-end
-
-def display_shuffling
-  prompt MESSAGES['shuffling']
-  sleep 3
-end
-
-def display_winner(score)
-  if score[:player] == POINTS_TO_WIN
-    prompt MESSAGES['player_winner']
-    puts
-  elsif score[:dealer] == POINTS_TO_WIN
-    prompt MESSAGES['dealer_winner']
-    puts
-  end
-end
-
 def end_of_round(current_round, score, hands)
   display_board(current_round, score, hands, false)
   display_result(hands[:player][:value], hands[:dealer][:value])
@@ -415,13 +415,12 @@ loop do
         dealer: { cards: [deal_card(deck), deal_card(deck)] },
         player: { cards: [deal_card(deck), deal_card(deck)] }
       }
-
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
 
       player_turn(deck, hands, current_round, score)
       dealer_turn(deck, hands, current_round, score) unless busted?(hands[:player][:value])
-  
+
       score = keep_score(hands, score)
       end_of_round(current_round, score, hands)
 
