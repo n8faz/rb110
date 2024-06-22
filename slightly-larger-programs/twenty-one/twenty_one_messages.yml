@@ -9,8 +9,8 @@ invalid_hit_or_stay: "Invalid answer. Please enter '(h)it' or '(s)tay'"
 points: "The winner of each hand earns one point. The first to "
 final_score: "Final Score: "
 current_score: "Current Score: "
-next_round?: "Are you ready for the next round? (Y to continue or N to exit game)"
-play?: "Shall we play? (Y for yes N for no)"
+next_round?: "Are you ready for the next round? (Enter to Continue or Q to Quit)"
+play?: "Shall we play? "
 dealer_cards: "****************** DEALER CARDS ******************"
 player_cards: "****************** PLAYER CARDS ******************"
 read_rules?: "Would you like to read the rules?"
@@ -46,7 +46,7 @@ rules: "****************** RULES ******************
 \n - A 'push' is when you and the dealer have the same score 
 \n - When there is a push no one wins the hand
 \n
-\n => Press Enter to continue "
+\n=> Press Enter to continue "
 line: "--------------------------------------------------"
 play_again?: "Would you like to play again?"
 blank_space: "   "

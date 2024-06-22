@@ -56,7 +56,8 @@ end
 
 def next_round?
   prompt MESSAGES['next_round?']
-  answer
+  answer = gets.chomp.downcase
+  false if answer.start_with?('q')
 end
 
 def read_rules?
@@ -443,13 +444,16 @@ if play == 'yes'
       }
       hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
       hands[:player][:value] = calculate_value(hands[:player][:cards])
+
       player_turn(deck, hands, round, score)
       unless busted?(hands[:player][:value])
         dealer_turn(deck, hands, round, score)
       end
+
       score = keep_score(hands, score)
       end_of_round(round, score, hands)
-      break if game_over?(score) || next_round? == 'no'
+
+      break if game_over?(score) || !next_round?
     end
     break unless play_again?
   end
