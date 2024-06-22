@@ -10,7 +10,7 @@ CARD_VALUES =
 
 SCORE = 21
 DEALER_STAY_AT = 17
-POINTS_TO_WIN = 5
+POINTS_TO_WIN = 2
 
 def clear_screen
   system "clear"
@@ -392,9 +392,9 @@ def end_of_round(current_round, score, hands)
   display_board(current_round, score, hands, false)
   display_result(hands[:player][:value], hands[:dealer][:value])
   puts
+  display_winner(score)
   display_score(score)
   puts
-  display_winner(score)
 end
 
 # Program Start
