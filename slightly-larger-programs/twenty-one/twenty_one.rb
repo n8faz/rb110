@@ -221,7 +221,7 @@ def dealer_stays(hands)
 end
 
 def player_stays(hands)
-  prompt "#{MESSAGES['you_stay']} #{hands[:player][:value]}"
+  prompt "#{MESSAGES['player_stays']} #{hands[:player][:value]}"
   sleep 3
 end
 
@@ -282,7 +282,7 @@ end
 
 def display_intro
   clear_screen
-  prompt "Let's play 21!"
+  prompt MESSAGES['lets_play']
   display_rules if read_rules? == 'yes'
 end
 
