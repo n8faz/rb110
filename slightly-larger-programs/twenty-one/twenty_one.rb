@@ -38,6 +38,22 @@ def yes_or_no?(answer)
   end
 end
 
+def busted?(total)
+  total > SCORE
+end
+
+def reach_score?(total)
+  total == SCORE
+end
+
+def dealer_stay?(total)
+  total >= DEALER_STAY_AT
+end
+
+def game_over?(score, points)
+  score[:player] == points || score[:dealer] == points
+end
+
 def play?
   prompt MESSAGES['play?']
   answer
@@ -49,10 +65,6 @@ def play_again?
   true if answer == 'yes'
 end
 
-def game_over?(score, points)
-  score[:player] == points || score[:dealer] == points
-end
-
 def next_round?
   prompt MESSAGES['next_round?']
   answer = gets.chomp.downcase
@@ -62,18 +74,6 @@ end
 def read_rules?
   prompt MESSAGES['read_rules?']
   answer
-end
-
-def busted?(total)
-  total > SCORE
-end
-
-def dealer_stay?(total)
-  total >= DEALER_STAY_AT
-end
-
-def reach_score?(total)
-  total == SCORE
 end
 
 def hit_or_stay?
@@ -129,38 +129,6 @@ end
 
 def hide_card(cards)
   [cards[0], [:X, 'X']]
-end
-
-def player_hit_score
-  prompt "You hit #{SCORE}! Nice!"
-  sleep 3
-end
-
-def dealer_reveals
-  prompt MESSAGES['revealing']
-  sleep 3
-end
-
-def dealer_stays(hands)
-  prompt "#{MESSAGES['dealer_stays']} #{hands[:dealer][:value]}"
-  sleep 3
-end
-
-def player_stays(hands)
-  prompt "#{MESSAGES['you_stay']} #{hands[:player][:value]}"
-  sleep 3
-end
-
-def dealer_hits(deck, hands)
-  prompt MESSAGES['dealer_hits']
-  sleep 3
-  hands[:dealer][:cards] << deal_card(deck)
-end
-
-def player_hits(deck, hands)
-  hands[:player][:cards] << deal_card(deck)
-  prompt MESSAGES['dealing_card']
-  sleep 3
 end
 
 def skip_aces(values, sum)
@@ -237,16 +205,57 @@ def keep_score(hands, score)
   score
 end
 
-def display_intro
-  clear_screen
-  prompt "Let's play 21!"
-  display_rules if read_rules? == 'yes'
+def player_hit_score
+  prompt "You hit #{SCORE}! Nice!"
+  sleep 3
 end
 
-def display_rules
-  clear_screen
-  puts MESSAGES['rules']
-  gets.chomp
+def dealer_reveals
+  prompt MESSAGES['revealing']
+  sleep 3
+end
+
+def dealer_stays(hands)
+  prompt "#{MESSAGES['dealer_stays']} #{hands[:dealer][:value]}"
+  sleep 3
+end
+
+def player_stays(hands)
+  prompt "#{MESSAGES['you_stay']} #{hands[:player][:value]}"
+  sleep 3
+end
+
+def dealer_hits(deck, hands)
+  prompt MESSAGES['dealer_hits']
+  sleep 3
+  hands[:dealer][:cards] << deal_card(deck)
+end
+
+def player_hits(deck, hands)
+  prompt MESSAGES['dealing_card']
+  sleep 3
+  hands[:player][:cards] << deal_card(deck)
+end
+
+def display_value(cards)
+  values = cards.map { |card| card[1] }
+  sum = 0
+
+  if values.include?('A')
+    sum = skip_aces(values, sum)
+
+    (number_of_aces(values) - 1).times { sum += 1 }
+
+    if (sum + 11) >= SCORE
+      sum = calculate_value(cards)
+    else
+      sum += 11
+      sum = "#{(sum - 10)} (or #{sum})"
+    end
+  else
+    sum = calculate_value(cards)
+  end
+  sum
 end
 
 # rubocop:disable Metrics/AbcSize
@@ -270,6 +279,18 @@ def display_card_art(cards)
   puts MESSAGES['blank_space'] + ("└───────┘     " * cards.size)
 end
 # rubocop:enable Metrics/AbcSize
+
+def display_intro
+  clear_screen
+  prompt "Let's play 21!"
+  display_rules if read_rules? == 'yes'
+end
+
+def display_rules
+  clear_screen
+  puts MESSAGES['rules']
+  gets.chomp
+end
 
 def display_dealer_info(hands, hide, stay)
   puts MESSAGES['dealer_cards']
@@ -364,26 +385,6 @@ def display_winner(score, points)
   end
 end
 
-def display_value(cards)
-  values = cards.map { |card| card[1] }
-  sum = 0
-
-  if values.include?('A')
-    sum = skip_aces(values, sum)
-
-    (number_of_aces(values) - 1).times { sum += 1 }
-
-    if (sum + 11) >= SCORE
-      sum = calculate_value(cards)
-    else
-      sum += 11
-      sum = "#{(sum - 10)} (or #{sum})"
-    end
-  else
-    sum = calculate_value(cards)
-  end
-  sum
-end
 
 def display_exit_message(play)
   if play == 'no'
@@ -452,10 +453,10 @@ play = play?
 if play == 'yes'
   points = how_many_points?
 
-  loop do
+  loop do # game loop
     score = { player: 0, dealer: 0 }
     round = 0
-    loop do
+    loop do # round loop
       display_shuffling
       round += 1
       deck = initialize_deck
