@@ -120,6 +120,17 @@ def initialize_deck
   deck
 end
 
+def initialize_hands(deck)
+  hands = {
+    dealer: { cards: [deal_card(deck), deal_card(deck)] },
+    player: { cards: [deal_card(deck), deal_card(deck)] }
+  }
+  hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
+  hands[:player][:value] = calculate_value(hands[:player][:cards])
+
+  hands
+end
+
 def deal_card(deck)
   suit = deck.keys.sample
   value = deck[suit].sample
@@ -459,12 +470,7 @@ if play == 'yes'
       display_shuffling
       round += 1
       deck = initialize_deck
-      hands = {
-        dealer: { cards: [deal_card(deck), deal_card(deck)] },
-        player: { cards: [deal_card(deck), deal_card(deck)] }
-      }
-      hands[:dealer][:value] = calculate_value(hands[:dealer][:cards])
-      hands[:player][:value] = calculate_value(hands[:player][:cards])
+      hands = initialize_hands(deck)
 
       player_turn(deck, hands, round, score, points)
       unless busted?(hands[:player][:value])
