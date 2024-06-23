@@ -28,10 +28,10 @@ rules: "********************* RULES *********************
 \n    - If the dealer goes over 21 they bust and you win
 \n
 \n - If neither of you bust, your scores are compared
-\n - Whoever is closest to 21 without going over wins the hand
+\n - Whoever is closest to 21 without going over wins
 \n - A 'push' is when you and the dealer have the same score 
-\n - When there is a push no one wins the hand
-\n - The winner of the hand earns one point
+\n - When there is a push no one wins
+\n - The winner of the round earns one point
 \n - You will decide how many points it takes to win 
 \n
 \n=> Press Enter to continue "
@@ -46,7 +46,7 @@ player_cards: "****************** PLAYER HAND ******************"
 line: "-------------------------------------------------"
 blank_space: "   "
 shuffling: "Shuffling Cards..."
-hit_or_stay?: "hit or stay? type 'h' to hit or 's' to stay"
+hit_or_stay?: "Hit or stay? Type 'h' to hit or 's' to stay"
 invalid_hit_or_stay: "Invalid answer. Please enter '(h)it' or '(s)tay'"
 dealing_card: "Dealing card..."
 revealing: "Revealing Dealer's Card..."
@@ -60,7 +60,7 @@ dealer_win: "Dealer wins"
 push: "It's a push."
 player_winner: "You're the winner! Congratulations!"
 dealer_winner: "Dealer is the winner."
-next_round?: "Are you ready for the next round? (Enter to Continue or Q to Quit)"
+next_round?: "Continue to the next round? (Enter to Continue or Q to Quit)"
 play_again?: "Would you like to play again?"
 thanks: "Thanks for playing! Goodbye!"
 didnt_play: "Maybe another time then. Goodbye!"
