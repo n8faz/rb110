@@ -354,7 +354,7 @@ end
 
 def display_round(round, score, points)
   clear_screen
-  puts "********************* ROUND #{round} ********************"
+  puts "******************** ROUND #{round} ********************"
   puts
   display_score(score, points)
   puts
@@ -384,7 +384,6 @@ def display_winner(score, points)
     puts
   end
 end
-
 
 def display_exit_message(play)
   if play == 'no'

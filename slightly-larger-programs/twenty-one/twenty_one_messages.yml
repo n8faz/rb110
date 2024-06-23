@@ -11,10 +11,10 @@ final_score: "Final Score: "
 current_score: "Current Score: "
 next_round?: "Are you ready for the next round? (Enter to Continue or Q to Quit)"
 play?: "Would you like to play? "
-dealer_cards: "****************** DEALER CARDS ******************"
-player_cards: "****************** PLAYER CARDS ******************"
+dealer_cards: "****************** DEALER HAND ******************"
+player_cards: "****************** PLAYER HAND ******************"
 read_rules?: "Would you like to read the rules?"
-rules: "****************** RULES ******************
+rules: "********************* RULES *********************
 \n
 \n - You will be playing against the dealer
 \n - Both you and the dealer are dealt two cards from a standard 52 card deck
